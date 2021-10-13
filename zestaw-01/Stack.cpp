@@ -1,6 +1,6 @@
 #include <iostream>
-#include "ArrayStack.hpp"
-// #include "LinkedStack.hpp"
+// #include "ArrayStack.hpp"
+#include "LinkedStack.hpp"
 
 int main() {
 

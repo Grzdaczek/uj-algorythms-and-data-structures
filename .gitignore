@@ -1,0 +1,11 @@
+.DS_Store
+.tmp
+.vscode
+*.x
+*.o
+*.d
+*.a
+*.so
+*.swap
+*.tmp
+*.log
