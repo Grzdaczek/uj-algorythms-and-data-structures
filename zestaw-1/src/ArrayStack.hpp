@@ -1,43 +1,38 @@
 #include <stdexcept>
 
 // capacity może być przekazywane jako parametr w template
-
 class Stack {
+public:
+	Stack(int capacity) {
+	   this->_data = new int[capacity];
+	   this->_capacity = capacity;
+	}
 
-    public:
+	~Stack() {
+		delete this->_data;
+	}
 
-    Stack(int capacity) {
-       this->_data = new int[capacity];
-       this->_size = -1;
-       this->_capacity = capacity;
-    }
+	void push(int item) {
+	   if (this->_size == this->_capacity) throw std::out_of_range("push on full stack");
+	   this->_data[++this->_size] = item;
+	}
 
-    ~Stack() {
-        delete this->_data;
-    }
+	int pop() {
+		if (this->_size == 0) throw std::out_of_range("pop from empty stack");
+		return this->_data[this->_size--];
+	}
 
-    void push(int item) {
-       if (this->_size == this->_capacity) throw std::out_of_range("stack is full");
-       this->_data[++this->_size] = item;
-    }
+	int size() {
+		return this->_size;
+	}
 
-    int pop() {
-        if (this->_size == -1) throw std::out_of_range("stack is empty");
-        return this->_data[this->_size--];
-    }
+	bool empty() {
+		return this->_size == 0;
+	}
 
-    int size() {
-        return this->_size;
-    }
-
-    bool empty() {
-        return this->_size == -1;
-    }
-
-    private:
-    
-    int _size;
-    int _capacity;
-    int* _data;
+private:
+	unsigned int _size = 0;
+	unsigned int _capacity;
+	int* _data;
 
 };
