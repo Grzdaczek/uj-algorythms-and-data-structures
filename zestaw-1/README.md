@@ -1,4 +1,4 @@
-### Zestaw 1
+# Zestaw 1
 ## Stos
 
 Abstrakcyjny typ danych (Abstract data type, ADT), model matematyczny typu danych opisujący jego właściwości, a nie jego impolementację
@@ -12,13 +12,13 @@ Zabezpieczenia:
 - Przed pop() na pustym stosie
 - przed push(a) na pełnym stosie
 
-# Implementacja tablicowa
+### Implementacja tablicowa
 
 Pola:
 - `top` - wskaźnik na ostatni element stosu
 - `data` - wskaźnik na tablicę danych
 
-# Implementacja wskaźnikowa
+### Implementacja wskaźnikowa
 
 Zawiera *węzły*, każdy znich przechowuje elemet T [szablon] oraz wskaźnik do poprzednioego *węzła*
 
@@ -28,6 +28,6 @@ Pola:
 - `size` - aby funkcja `size()` mogła szybko zwrócić wielkośc stosu
 - `top` - wskaźnik na ostatni *węzeł*
 
-# Uwagi
+### Uwagi
 Oby dwie implementacje, mają mieć identyczne API 
 

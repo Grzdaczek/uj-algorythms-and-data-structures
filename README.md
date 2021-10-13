@@ -1,5 +1,5 @@
-## Algorytmy i struktury danych
-# zaliczenie:
+# Algorytmy i struktury danych
+## zaliczenie:
 - 7 zestawów razy 10ptk
 - projekt 30ptk
 
