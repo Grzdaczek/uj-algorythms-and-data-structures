@@ -9,9 +9,13 @@ CCFLAGS		+= -O2
 CCFLAGS		+= -pedantic
 #=-----------------------------------------------------------------------------
 
-all: Stack.x
+all: Stack.x Generator.x
 
 Stack.x: Stack.o
+	@printf "  LD\t$^\n"
+	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+Generator.x: Generator.o
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 

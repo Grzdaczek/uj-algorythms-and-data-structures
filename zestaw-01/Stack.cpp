@@ -1,23 +1,37 @@
 #include <iostream>
-// #include "ArrayStack.hpp"
 #include "LinkedStack.hpp"
+// #include "ArrayStack.hpp"
 
 int main() {
 
 	Stack stack(10);
 	
-	std::cout << "size: " << stack.size() << std::endl;
-	
-	std::cout << "push: 2, 3" << std::endl;
-	stack.push(2);
-	stack.push(3);
+	while(true) {
+		std::string s;
+		std::getline(std::cin, s);
+		char c;
+		if(s.size()) c = s.at(0);
+		else break;
 
-	std::cout << "size: " << stack.size() << std::endl;
-	
-	std::cout << "empty: " << stack.empty() << std::endl;
-	
-	std::cout << "pop: " << stack.pop() << ", " << stack.pop() << std::endl;
-	std::cout << "size: " << stack.size() << std::endl;
-	std::cout << "empty: " << stack.empty() << std::endl;
+		switch (c) {
+			case 'A':
+				stack.push(std::stoi(s.substr(1)));
+				break;
+			case 'D':
+				try {
+					std::cout << stack.pop() << std::endl;
+				}
+				catch(std::exception const& e) {
+					std::cout << "EMPTY" << std::endl;
+				}
+				break;
+			case 'S':
+				std::cout << stack.size() << std::endl;
+				break;
+			default:
+				throw std::invalid_argument("no match for command");
+				break;
+		}
+	}
 
 }
