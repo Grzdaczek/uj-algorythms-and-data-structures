@@ -1,26 +1,30 @@
 #include <stdexcept>
 
-// capacity może być przekazywane jako parametr w template
+template<class T, int N>
 class Stack {
 public:
-	Stack(int capacity) {
-	   this->_data = new int[capacity];
-	   this->_capacity = capacity;
+	Stack() {
+	   this->_data = new int[N];
 	}
 
 	~Stack() {
 		delete this->_data;
 	}
 
-	void push(int item) {
+    template<class U>
+	void push(U&& item) {
 	   if (this->_size == this->_capacity) throw std::out_of_range("push on full stack");
 	   this->_data[++this->_size] = item;
 	}
 
-	int pop() {
+	T pop() {
 		if (this->_size == 0) throw std::out_of_range("pop from empty stack");
 		return this->_data[this->_size--];
 	}
+
+    T& top() {
+        return this->size == 0 ? &this->_data[this->_size] : nullptr;
+    }
 
 	int size() {
 		return this->_size;
@@ -32,7 +36,7 @@ public:
 
 private:
 	unsigned int _size = 0;
-	unsigned int _capacity;
+	unsigned int _capacity = N;
 	int* _data;
 
 };

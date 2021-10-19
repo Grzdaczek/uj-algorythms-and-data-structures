@@ -4,7 +4,7 @@
 
 int main() {
 
-	Stack stack(10);
+	Stack<int, 10> stack;
 	
 	while(true) {
 		std::string s;
