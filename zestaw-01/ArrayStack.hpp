@@ -4,17 +4,16 @@ template<class T, int N>
 class Stack {
 public:
 	Stack() {
-	   this->_data = new int[N];
+		this->_data = new T[N];
 	}
 
 	~Stack() {
 		delete this->_data;
 	}
 
-    template<class U>
-	void push(U&& item) {
-	   if (this->_size == this->_capacity) throw std::out_of_range("push on full stack");
-	   this->_data[++this->_size] = item;
+	void push(T item) {
+		if (this->_size == this->_capacity) throw std::out_of_range("push on full stack");
+		this->_data[++this->_size] = item;
 	}
 
 	T pop() {
@@ -22,9 +21,11 @@ public:
 		return this->_data[this->_size--];
 	}
 
-    T& top() {
-        return this->size == 0 ? &this->_data[this->_size] : nullptr;
-    }
+	T& top() {
+		if (this->_size == 0) throw std::out_of_range("top on epmpy stack");
+		return this->_data[this->_size];
+	}
+
 
 	int size() {
 		return this->_size;
@@ -37,6 +38,6 @@ public:
 private:
 	unsigned int _size = 0;
 	unsigned int _capacity = N;
-	int* _data;
+	T* _data;
 
 };

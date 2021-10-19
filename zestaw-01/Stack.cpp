@@ -6,11 +6,11 @@ int main() {
 
 	Stack<int, 10> stack;
 	
-	while(true) {
+	while (stack.size() < 4) {
 		std::string s;
 		std::getline(std::cin, s);
 		char c;
-		if(s.size()) c = s.at(0);
+		if (s.size()) c = s.at(0);
 		else break;
 
 		switch (c) {
@@ -21,7 +21,7 @@ int main() {
 				try {
 					std::cout << stack.pop() << std::endl;
 				}
-				catch(std::exception const& e) {
+				catch (std::exception const& e) {
 					std::cout << "EMPTY" << std::endl;
 				}
 				break;
