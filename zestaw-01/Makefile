@@ -4,9 +4,12 @@ LD		:= g++
 AR		:= ar rv
 RM		:= rm -rf
 
-CCFLAGS		+= -Wall
-CCFLAGS		+= -O2
-CCFLAGS		+= -pedantic
+CCFLAGS	+= -Wall
+CCFLAGS	+= -O2
+CCFLAGS	+= -pedantic
+
+HPP		+= LinkedStack.hpp
+HPP		+= ArrayStack.hpp
 #=-----------------------------------------------------------------------------
 
 all: Stack.x Generator.x ONP.x
@@ -23,7 +26,7 @@ Generator.x: Generator.o
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-%.o: %.cpp
+%.o: %.cpp $(HPP)
 	@printf "  CC\t$<\n"
 	$(Q)$(CC) $(CCFLAGS) -c $< -o $@ 
 
