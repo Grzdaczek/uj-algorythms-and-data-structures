@@ -23,15 +23,21 @@ int main() {
 		std::back_inserter(symbols)
 	);
 
+    std::string o = "";
+
 	for (std::string symbol : symbols) {
 		if (isnumber(symbol)) {
-			std::cout << symbol << " ";
+            o.append(symbol + " ");
 		}
 		else if (symbol != "(" && symbol != ")") {
 			opstack.push(symbol.at(0));
 		}
 		else if (symbol == ")") {
-			std::cout << opstack.pop() << (opstack.empty() ? "\n" : " ");
+            o.append(1, opstack.pop());
+            o.append(" ");
 		}
 	}
+
+    o.pop_back();
+    std::cout << o << std::endl;
 }
