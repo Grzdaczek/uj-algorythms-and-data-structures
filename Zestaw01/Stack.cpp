@@ -5,9 +5,12 @@
 int main() {
 
 	Stack<int, 10> stack;
-	
-	while (stack.size() < 4) {
-		std::string s;
+
+	std::string s;
+	std::getline(std::cin, s);
+    int op = std::stoi(s);
+
+	for(int i = 0; i < op; i++) {
 		std::getline(std::cin, s);
 		char c;
 		if (s.size()) c = s.at(0);
