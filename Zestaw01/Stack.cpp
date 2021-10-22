@@ -4,7 +4,7 @@
 
 int main() {
 
-	Stack<int, 10> stack;
+	Stack<int, 1000000> stack;
 
 	std::string s;
 	std::getline(std::cin, s);
