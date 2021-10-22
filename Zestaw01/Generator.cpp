@@ -9,7 +9,9 @@ int main() {
 	std::uniform_int_distribution<std::mt19937::result_type> commandDist(0, 2);
 	std::uniform_int_distribution<std::mt19937::result_type> itemDist(0, 100);
 
-	for (int i = 0; i<n; i++) {
+	std::cout << n << std::endl;
+	
+    for (int i = 0; i<n; i++) {
 		switch (commandDist(rng)) {
 			case 0:
 				std::cout << 'A' << ' ' << itemDist(rng) << std::endl;
