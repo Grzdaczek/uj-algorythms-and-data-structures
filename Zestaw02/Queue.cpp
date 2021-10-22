@@ -4,7 +4,7 @@
 
 int main() {
 
-	Queue<int, 1000000> queue;
+	Queue<int, 4> queue;
 
 	std::string s;
 	std::getline(std::cin, s);
@@ -22,7 +22,8 @@ int main() {
 				break;
 			case 'D':
 				try {
-					std::cout << queue.pop() << std::endl;
+					std::cout << queue.top() << std::endl;
+					queue.pop();
 				}
 				catch (std::exception const& e) {
 					std::cout << "EMPTY" << std::endl;

@@ -12,9 +12,13 @@ HPP		+= LinkedQueue.hpp
 HPP		+= ArrayQueue.hpp
 #=-----------------------------------------------------------------------------
 
-all: Queue.x
+all: Queue.x Generator.x
 
 Queue.x: Queue.o
+	@printf "  LD\t$^\n"
+	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+Generator.x: Generator.o
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 

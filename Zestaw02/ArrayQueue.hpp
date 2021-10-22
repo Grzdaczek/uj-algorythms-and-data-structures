@@ -4,43 +4,50 @@
 template<class T, int N>
 class Queue {
 private:
-	T _data[N];
-	int _head = 0;
-	int _tail = 0;
-	int _size = 0;
-	const int _capacity = N;
+	T m_data[N];
+	int m_head = 0;
+	int m_tail = 0;
+	int m_size = 0;
+	const int m_capacity = N;
 
-public:
 	template<class U>
-	void push(U&& item) {
-		if (this->_size == this->_capacity)
+	void enque(U&& item) {
+		if (m_size == m_capacity)
 			throw std::out_of_range("push on full queue");
-		this->_data[this->_tail] = item;
-		this->_size++;
-		this->_tail++;
+		m_data[m_tail] = std::move(item);
+		m_size ++;
+		m_tail += (m_tail + 1) % m_capacity;
 	}
 
-	T pop() {
-		if (this->_size == 0)
+public:
+
+	void push(const T& item) {
+		enque(item);
+	}
+
+	void push(T&& item) { 
+		enque(std::move(item));
+	}
+
+	void pop() {
+		if (m_size == 0)
 			throw std::out_of_range("pop on empty queue");
-		T item = this->_data[this->_head];
-		this->_head++;
-		this->_size--;
-		return item;
+		m_head += (m_head + 1) % m_capacity;
+		m_size --;
 	}
 
 	T& top() {
-		if (this->_size == 0)
+		if (m_size == 0)
 			throw std::out_of_range("top on empty queue");
-		return this->_data[this->_head];
+		return m_data[m_head];
 	}
 
 	int size() {
-		return this->_size;
+		return m_size;
 	}
 
 	bool empty() {
-		return this->_size == 0 ? true : false;
+		return m_size == 0 ? true : false;
 	}
 
 };
