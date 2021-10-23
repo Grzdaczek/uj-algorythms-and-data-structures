@@ -16,11 +16,10 @@ private:
 			throw std::out_of_range("push on full queue");
 		m_data[m_tail] = std::move(item);
 		m_size ++;
-		m_tail += (m_tail + 1) % m_capacity;
+		m_tail = (m_tail + 1) % m_capacity;
 	}
 
 public:
-
 	void push(const T& item) {
 		enque(item);
 	}
@@ -32,7 +31,7 @@ public:
 	void pop() {
 		if (m_size == 0)
 			throw std::out_of_range("pop on empty queue");
-		m_head += (m_head + 1) % m_capacity;
+		m_head = (m_head + 1) % m_capacity;
 		m_size --;
 	}
 
