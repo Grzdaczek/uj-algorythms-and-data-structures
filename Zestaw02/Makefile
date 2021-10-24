@@ -7,6 +7,7 @@ RM		:= rm -rf
 CCFLAGS	+= -Wall
 CCFLAGS	+= -O2
 CCFLAGS	+= -pedantic
+CCFLAGS	+= -std=c++17
 
 HPP		+= LinkedQueue.hpp
 HPP		+= ArrayQueue.hpp

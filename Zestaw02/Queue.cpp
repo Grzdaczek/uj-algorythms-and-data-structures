@@ -1,11 +1,10 @@
 #include <iostream>
-// #include "LinkedQueue.hpp"
-#include "ArrayQueue.hpp"
+#include <cmath>
+#include "LinkedQueue.hpp"
+// #include "ArrayQueue.hpp"
 
 int main() {
-
-	Queue<int, 4> queue;
-
+	Queue<int, 1000000> queue;
 	std::string s;
 	std::getline(std::cin, s);
     int op = std::stoi(s);
@@ -13,8 +12,11 @@ int main() {
 	for(int i = 0; i < op; i++) {
 		std::getline(std::cin, s);
 		char c;
-		if (s.size()) c = s.at(0);
-		else break;
+
+		if (s.size()) 
+			c = s.at(0);
+		else 
+			break;
 
 		switch (c) {
 			case 'A':
