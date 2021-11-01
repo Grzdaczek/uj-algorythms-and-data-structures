@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "LinkedList.hpp"
 
 int main() {
@@ -36,7 +37,7 @@ int main() {
 			default:
 				throw std::invalid_argument("no match for command");
 				break;
-            */
+			*/
 		}
 	}
 
