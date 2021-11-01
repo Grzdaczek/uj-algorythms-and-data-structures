@@ -10,10 +10,10 @@ class List {
     int pop_front();            // Usuwa i zwraca element z początku listy
     void push_back(int x);      // Dołącza element na koniec listyint 
     pop_back();                 // Usuwa i zwraca element z końca listy
-    int size();                 // Zwraca liczbę elementów w liściebool 
-    empty();                    // Zwraca true gdy lista jest pusta
-    void clear();               // Czyści listęint 
-    find(int x);                // Zwraca pozycję pierwszego elementu o wartości x
+    int size();                 // Zwraca liczbę elementów w liście
+    bool empty();               // Zwraca true gdy lista jest pusta
+    void clear();               // Czyści listę
+    int find(int x);            // Zwraca pozycję pierwszego elementu o wartości x
     int erase(int i);           // Usuwa i zwraca element na pozycji i
     void insert(int i, int x);  // Wstawia element x przed pozycję i
     int remove(int x);          // Usuwa wystąpienia x i zwraca ich liczbę
