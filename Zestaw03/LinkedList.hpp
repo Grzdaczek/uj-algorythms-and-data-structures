@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 template<class T> // std::farward: TODO
 class List {
 private:
@@ -19,11 +21,12 @@ public:
 
 	class iterator {
 	private:
-		Node* ptr;
-		friend List;
-	public:
+		Node* m_guard;
+		Node* m_ptr;
 		iterator() = delete;
-		iterator(Node* p) : ptr(p) {};
+		iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {};
+	public:
+		friend List;
 		T& operator*() const;
 		iterator operator++();
 		iterator operator--();
@@ -56,7 +59,7 @@ public:
 	iterator end();
 
 	// Wyszukuje element o wartości "x" i zwraca jego pozycję
-	iterator find(const T& x) const;
+	iterator find(const T& x);
 
 	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
 	iterator erase(iterator it);
@@ -99,7 +102,7 @@ List<T>::List(List<T>&& other) {
 
 template<class T>
 List<T>::~List() {
-
+	this->clear();
 }
 
 template<class T>
@@ -133,49 +136,66 @@ List<T> List<T>::operator=(List<T>&& other) {
 template<class T>
 template<class U>
 void List<T>::push_front(U&& x) {
-	auto it = List<T>::iterator(this->m_guard.next);
+	auto it = this->begin();
 	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 template<class U>
 void List<T>::push_back(U&& x) {
-	auto it = List<T>::iterator(&this->m_guard);
+	auto it = this->end();
 	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 T List<T>::pop_front() {
-	// TODO: implement
-	T _;
-	return _;
+	auto it = this->begin();
+	T element = *it;
+	this->erase(it);
+	return element;
 }
 
 template<class T>
 T List<T>::pop_back() {
-	// TODO: implement
-	T _;
-	return _;
+	auto it = --this->end();
+	T element = *it;
+	this->erase(it);
+	return element;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::begin() {
-	return List<T>::iterator(this->m_guard.next);
+	return List<T>::iterator(this, this->m_guard.next);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::end() {
-	return List<T>::iterator(&this->m_guard);
+	return List<T>::iterator(this, &this->m_guard);
 }
 
 template<class T>
-typename List<T>::iterator List<T>::find(const T& x) const {
+typename List<T>::iterator List<T>::find(const T& x) {
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x)
+			return it;
+	}
 
+	return this->end();
 }
 
 template<class T>
 typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
+	if (it.m_ptr == it.m_guard)
+		return it;
+	
+	auto n = it.m_ptr;
+	n->next->prev = n->prev;
+	n->prev->next = n->next;
+	this->m_size --;
 
+	delete n;
+	++it;
+	return it;
 }
 
 template<class T>
@@ -183,8 +203,8 @@ template<class U>
 typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
 	auto n = new List<T>::Node();
 	n->value = x;
-	n->next = it.ptr;
-	n->prev = it.ptr->prev;
+	n->next = it.m_ptr;
+	n->prev = it.m_ptr->prev;
 
 	n->next->prev = n;
 	n->prev->next = n;
@@ -195,8 +215,16 @@ typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
 
 template<class T>
 int List<T>::remove(const T& x) {
-	// TODO: implement
-	return 0;
+	int n = 0;
+
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x) {
+			erase(it);
+			n ++;
+		}
+	}
+	
+	return n;
 }
 
 template<class T>
@@ -211,32 +239,40 @@ bool List<T>::empty() const {
 
 template<class T>
 void List<T>::clear() {
-
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		erase(it);
+	}
 }
 
 template<class T>
 T& List<T>::iterator::operator*() const {
-	// TODO: zabezpieczenie przed wyłuskiwaniem na guard node
-	return this->ptr->value;
+	if (this->m_guard == this->m_ptr)
+		throw std::out_of_range("can't dereference out of range iterator");
+
+	return this->m_ptr->value;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator++() {
-	// TODO: zabezpieczenie przez zwróceniem iteratora na guard node
-	this->ptr = this->ptr->next;
+	if (this->m_ptr == this->m_guard)
+		return *this;
+
+	this->m_ptr = this->m_ptr->next;
 	return *this;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator--() {
-	// TODO: zabezpieczenie przez zwróceniem iteratora na guard node
-	this->ptr = this->ptr->prev;
+	if (this->m_ptr == this->m_guard->next)
+		return *this;
+
+	this->m_ptr = this->m_ptr->prev;
 	return *this;
 }
 
 template<class T>
 bool List<T>::iterator::operator==(const List<T>::iterator& other) const {
-	return this->ptr == other.ptr;
+	return this->m_ptr == other.m_ptr;
 }
 
 template<class T>

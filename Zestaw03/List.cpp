@@ -6,14 +6,34 @@ int main() {
 	List<std::string> list;
 
 	list.push_front("42");
-	list.push_front('1');
 	list.push_front("111");
+	list.push_front('1');
 	list.push_back("A");
+	list.push_front("111");
+	list.push_back("111");
 	list.push_back("b");
 
-	for (auto it : list) {
-		std::cout << "it: " << it << std::endl;
-	}
+	// auto it = list.begin();
+	// std::cout << "it: " << *it << std::endl; ++it;
+	// std::cout << "it: " << *it << std::endl; ++it;
+	// std::cout << "it: " << *it << std::endl; ++it;
+	// std::cout << "it: " << *it << std::endl; ++it;
+	// std::cout << "it: " << *it << std::endl; ++it;
+	// std::cout << "it: " << *it << std::endl; ++it;
+	
+	std::cout << "--- V ---" << std::endl;
+	for (auto it : list) std::cout << "it: " << it << std::endl;
+
+	// list.erase(list.find("42"));
+	// std::cout << list.remove("111") << std::endl;
+	// std::cout << "pop: " <<  << std::endl;
+
+	list.clear();
+	list.push_back("CC");
+
+
+	std::cout << "--- V ---" << std::endl;
+	for (auto it : list) std::cout << "it: " << it << std::endl;
 
 	return 0;
 
