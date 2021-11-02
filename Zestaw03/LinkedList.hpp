@@ -1,44 +1,19 @@
 #include <stdexcept>
 
-template<class T> // std::farward: TODO
+template<class T>
 class List {
 private:
-	class Node {
-	public:
-		T value;
-		Node* prev;
-		Node* next;
-		Node() {};
-		Node(const T& v) : value(v) {}
-		Node(T&& v) : value(std::move(v)) {}
-	};
-
+	class Node;
 	Node m_guard;
 	int m_size = 0;
 
 public:
+	class iterator;
 	List ();
 	List (const List<T>& other);
 	List (List<T>&& other);
 	~List ();
-
-	class iterator {
-	private:
-		Node* m_guard;
-		Node* m_ptr;
-		iterator() = delete;
-		iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {}
-	public:
-		friend List;
-		T& operator*() const;
-		iterator operator++();
-		iterator operator--();
-		bool operator==(const iterator& other) const;
-		bool operator!=(const iterator& other) const;
-	};
-
 	List operator=(const List<T>& other);
-
 	List operator=(List<T>&& other);
 
 	// Uniwersalna referencja U&&, Wstawia element na początek listy
@@ -84,6 +59,34 @@ public:
 	void clear();
 
 };
+
+template<class T>
+class List<T>::Node {
+public:
+	T value;
+	Node* prev;
+	Node* next;
+	Node() {};
+	Node(const T& v) : value(v) {}
+	Node(T&& v) : value(std::move(v)) {}
+};
+
+template<class T>
+class List<T>::iterator {
+private:
+	Node* m_guard;
+	Node* m_ptr;
+	iterator() = delete;
+	iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {}
+public:
+	friend List;
+	T& operator*() const;
+	iterator operator++();
+	iterator operator--();
+	bool operator==(const iterator& other) const;
+	bool operator!=(const iterator& other) const;
+};
+
 
 //-----------------------------------------------------------------------------
 
