@@ -8,6 +8,9 @@ private:
 		T value;
 		Node* prev;
 		Node* next;
+		Node() {};
+		Node(const T& v) : value(v) {}
+		Node(T&& v) : value(std::move(v)) {}
 	};
 
 	Node m_guard;
@@ -24,7 +27,7 @@ public:
 		Node* m_guard;
 		Node* m_ptr;
 		iterator() = delete;
-		iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {};
+		iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {}
 	public:
 		friend List;
 		T& operator*() const;
@@ -127,8 +130,8 @@ List<T> List<T>::operator=(List<T>&& other) {
 	this->m_guard = other.m_guard;
 
 	other.m_size = 0;
-	other.m_guard.next = nullptr;
-	other.m_guard.prev = nullptr;
+	other.m_guard.next = &other.m_guard;
+	other.m_guard.prev = &other.m_guard;
 
 	return *this;
 }
@@ -201,8 +204,7 @@ typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
 template<class T>
 template<class U>
 typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
-	auto n = new List<T>::Node();
-	n->value = x;
+	auto n = new List<T>::Node(std::forward<U>(x));
 	n->next = it.m_ptr;
 	n->prev = it.m_ptr->prev;
 

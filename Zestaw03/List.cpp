@@ -2,16 +2,57 @@
 #include <vector>
 #include "LinkedList.hpp"
 
-int main() {
-	List<std::string> list;
+class S {
+public:
+	int m_value = 0;
 
-	list.push_front("42");
-	list.push_front("111");
-	list.push_front('1');
-	list.push_back("A");
-	list.push_front("111");
-	list.push_back("111");
-	list.push_back("b");
+	S() {
+		std::cout << "\t--created" << std::endl;
+	}
+	
+	S(int v) : m_value(v) {
+		std::cout << "\t--created" << std::endl;
+	}
+
+	S(const S& other) : m_value(other.m_value) {
+		std::cout << "\t--copied con" << std::endl;
+	}
+	
+	S(S&& other) : m_value(other.m_value) {
+		other.m_value = 0;
+		std::cout << "\t--moved con" << std::endl;
+	}
+
+	~S() {
+		std::cout << "\t--destroyed" << std::endl;
+	}
+
+	S operator=(const S& other) {
+		this->m_value = other.m_value;
+		std::cout << "\t--copied op" << std::endl;
+		return *this;
+	}
+
+	S operator=(S&& other) {
+		this->m_value = other.m_value;
+		other.m_value = 0;
+		std::cout << "--moved op" << std::endl;
+		return *this;
+	}
+};
+
+int main() {
+	List<S> a;
+	List<S> b;
+	a.push_front(33);
+
+	std::cout << "------------------------" << std::endl;
+	// a = b;
+
+	std::cout << "------------------------" << std::endl;
+	// a = std::move(b);
+
+	std::cout << "------------------------" << std::endl;
 
 	// auto it = list.begin();
 	// std::cout << "it: " << *it << std::endl; ++it;
@@ -21,21 +62,23 @@ int main() {
 	// std::cout << "it: " << *it << std::endl; ++it;
 	// std::cout << "it: " << *it << std::endl; ++it;
 	
-	std::cout << "--- V ---" << std::endl;
-	for (auto it : list) std::cout << "it: " << it << std::endl;
+	// std::cout << "--- V ---" << std::endl;
+	// for (auto it : list) std::cout << "it: " << it << std::endl;
 
 	// list.erase(list.find("42"));
 	// std::cout << list.remove("111") << std::endl;
 	// std::cout << "pop: " <<  << std::endl;
 
-	list.clear();
-	list.push_back("CC");
+	// list.clear();
+	// list.push_back("CC");
 
 
-	std::cout << "--- V ---" << std::endl;
-	for (auto it : list) std::cout << "it: " << it << std::endl;
+	// std::cout << "--- V ---" << std::endl;
+	// for (auto it : list) std::cout << "it: " << it << std::endl;
 
 	return 0;
+
+	/*
 
 	std::string s;
 	std::getline(std::cin, s);
@@ -87,7 +130,8 @@ int main() {
 				throw std::invalid_argument("no match for command");
 				break;
 			*/
-		}
-	}
+	//	}
+	//}
+	
 
 }
