@@ -1,30 +1,39 @@
 template<class T> // std::farward: TODO
 class List {
 private:
-	struct Node {
-		T item;
+	class Node {
+	public:
+		T value;
 		Node* prev;
 		Node* next;
 	};
 
 	Node m_guard;
-	int m_size;
+	int m_size = 0;
 
 public:
-	List () = default;
+	List ();
 	List (const List<T>& other);
 	List (List<T>&& other);
-	List operator=(const List<T>& other);
-	List operator=(List<T>&& other);
+	~List ();
 
-	struct iterator {
+	class iterator {
+	private:
 		Node* ptr;
-		iterator operator*();
+		friend List;
+	public:
+		iterator() = delete;
+		iterator(Node* p) : ptr(p) {};
+		T& operator*() const;
 		iterator operator++();
 		iterator operator--();
-		bool operator==(const iterator& other);
-		bool operator!=(const iterator& other);
+		bool operator==(const iterator& other) const;
+		bool operator!=(const iterator& other) const;
 	};
+
+	List operator=(const List<T>& other);
+
+	List operator=(List<T>&& other);
 
 	// Uniwersalna referencja U&&, Wstawia element na początek listy
 	template<class U>
@@ -47,7 +56,7 @@ public:
 	iterator end();
 
 	// Wyszukuje element o wartości "x" i zwraca jego pozycję
-	iterator find(const T& x);
+	iterator find(const T& x) const;
 
 	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
 	iterator erase(iterator it);
@@ -60,10 +69,10 @@ public:
 	int remove(const T& x);
 
 	// Zwraca liczbę elementów w liście
-	int size();
+	int size() const;
 
 	// Zwraca true gdy lista jest pusta
-	bool empty();
+	bool empty() const;
 
 	// Czyści listę
 	void clear();
@@ -73,63 +82,94 @@ public:
 //-----------------------------------------------------------------------------
 
 template<class T>
-List<T>::List(const List<T>& other) {
+List<T>::List() {
+	this->m_guard.next = &this->m_guard;
+	this->m_guard.prev = &this->m_guard;
+}
 
+template<class T>
+List<T>::List(const List<T>& other) {
+	*this = other;
 }
 
 template<class T>
 List<T>::List(List<T>&& other) {
+	*this = std::move(other);
+}
+
+template<class T>
+List<T>::~List() {
 
 }
 
 template<class T>
 List<T> List<T>::operator=(const List<T>& other) {
+	if (&other == this)
+		return *this;
 
+	this->clear();
+	for(const auto& value : other)
+		this->push_back(value);
+
+	return *this;
 }
 
 template<class T>
 List<T> List<T>::operator=(List<T>&& other) {
+	if (&other == this)
+		return *this;
 
+	this->clear();
+	this->m_size = other.m_size;
+	this->m_guard = other.m_guard;
+
+	other.m_size = 0;
+	other.m_guard.next = nullptr;
+	other.m_guard.prev = nullptr;
+
+	return *this;
 }
 
 template<class T>
 template<class U>
 void List<T>::push_front(U&& x) {
-
+	auto it = List<T>::iterator(this->m_guard.next);
+	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 template<class U>
 void List<T>::push_back(U&& x) {
-
+	auto it = List<T>::iterator(&this->m_guard);
+	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 T List<T>::pop_front() {
-
+	// TODO: implement
+	T _;
+	return _;
 }
 
 template<class T>
 T List<T>::pop_back() {
-
+	// TODO: implement
+	T _;
+	return _;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::begin() {
-	List<T>::iterator it;
-	it.ptr = this->m_guard.next;
-	return it;
+	return List<T>::iterator(this->m_guard.next);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::end() {
-	List<T>::iterator it;
-	it.ptr = this->m_guard.prev;
-	return it;
+	return List<T>::iterator(&this->m_guard);
 }
 
 template<class T>
-typename List<T>::iterator List<T>::find(const T& x) {
+typename List<T>::iterator List<T>::find(const T& x) const {
 
 }
 
@@ -141,35 +181,65 @@ typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
 template<class T>
 template<class U>
 typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
+	auto n = new List<T>::Node();
+	n->value = x;
+	n->next = it.ptr;
+	n->prev = it.ptr->prev;
 
+	n->next->prev = n;
+	n->prev->next = n;
+	this->m_size ++;
+
+	return it;
 }
 
 template<class T>
 int List<T>::remove(const T& x) {
+	// TODO: implement
+	return 0;
+}
+
+template<class T>
+int List<T>::size() const {
+	return this->m_size;
+}
+
+template<class T>
+bool List<T>::empty() const {
+	return this->size() == 0;
+}
+
+template<class T>
+void List<T>::clear() {
 
 }
 
 template<class T>
-typename List<T>::iterator List<T>::iterator::operator*() {
-
+T& List<T>::iterator::operator*() const {
+	// TODO: zabezpieczenie przed wyłuskiwaniem na guard node
+	return this->ptr->value;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator++() {
-
+	// TODO: zabezpieczenie przez zwróceniem iteratora na guard node
+	this->ptr = this->ptr->next;
+	return *this;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator--() {
-
+	// TODO: zabezpieczenie przez zwróceniem iteratora na guard node
+	this->ptr = this->ptr->prev;
+	return *this;
 }
 
 template<class T>
-bool List<T>::iterator::operator==(const List<T>::iterator& other) {
-
+bool List<T>::iterator::operator==(const List<T>::iterator& other) const {
+	return this->ptr == other.ptr;
 }
 
 template<class T>
-bool List<T>::iterator::operator!=(const List<T>::iterator& other) {
-
+bool List<T>::iterator::operator!=(const List<T>::iterator& other) const {
+	return !(*this == other);
 }

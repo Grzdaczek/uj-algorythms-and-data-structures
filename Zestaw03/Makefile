@@ -6,6 +6,7 @@ RM		:= rm -rf
 
 CXXFLAGS	+= -Wall
 CXXFLAGS	+= -O2
+CXXFLAGS	+= -g
 CXXFLAGS	+= -pedantic
 CXXFLAGS	+= -std=c++17
 
