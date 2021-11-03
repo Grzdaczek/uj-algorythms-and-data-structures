@@ -13,7 +13,7 @@ CXXFLAGS	+= -std=c++17
 HPP		+= LinkedList.hpp
 #=-----------------------------------------------------------------------------
 
-all: LinkedList.x
+all: LinkedList.x Generator.x
 
 %.x: %.o
 	@printf "  LD\t$^\n"
