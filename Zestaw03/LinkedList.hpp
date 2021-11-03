@@ -6,7 +6,7 @@ class List {
 private:
 	class Node;
 	Node* m_guard;
-	int m_size = 0;
+	int m_size;
 
 public:
 	class iterator;
@@ -76,8 +76,6 @@ protected:
 	Node(T&& v) : value(std::move(v)) {}
 public:
 	friend List;
-	// friend iterator;
-	// friend const_iterator;
 	T value;
 	Node* prev;
 	Node* next;
@@ -112,17 +110,20 @@ public:
 
 template<class T>
 List<T>::List() {
+	this->m_size = 0;
 	this->m_guard = new Node();
 }
 
 template<class T>
 List<T>::List(const List<T>& other) {
+	this->m_size = 0;
 	this->m_guard = new Node();
 	*this = other;
 }
 
 template<class T>
 List<T>::List(List<T>&& other) {
+	this->m_size = 0;
 	this->m_guard = new Node();
 	*this = std::move(other);
 }
