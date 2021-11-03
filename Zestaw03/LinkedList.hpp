@@ -47,6 +47,9 @@ public:
 	// Wyszukuje element o wartości "x" i zwraca jego pozycję
 	iterator find(const T& x);
 
+	// Wyszukuje element o wartości "x" i zwraca jego pozycję
+	const_iterator find(const T& x) const;
+
 	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
 	iterator erase(iterator it);
 
@@ -217,6 +220,16 @@ typename List<T>::iterator List<T>::end() {
 
 template<class T>
 typename List<T>::iterator List<T>::find(const T& x) {
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x)
+			return it;
+	}
+
+	return this->end();
+}
+
+template<class T>
+typename List<T>::const_iterator List<T>::find(const T& x) const {
 	for (auto it = this->begin(); it != this->end(); ++it) {
 		if (*it == x)
 			return it;
