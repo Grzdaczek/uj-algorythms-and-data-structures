@@ -43,16 +43,23 @@ public:
 
 int main() {
 	List<S> a;
-	List<S> b;
-	a.push_front(33);
+	// List<S> b;
 
-	std::cout << "------------------------" << std::endl;
-	// a = b;
+	std::cout << "------------------------ create" << std::endl;
+	a.push_front(1);
 
-	std::cout << "------------------------" << std::endl;
+	std::cout << "------------------------ copy" << std::endl;
+	List<S> c(a);
+	// List<S> c(std::move(a));
+
+	std::cout << "------------------------ end" << std::endl;
+
+	// a.size();
+	// b.size();
+	// std::cout << "------------------------" << std::endl;
 	// a = std::move(b);
 
-	std::cout << "------------------------" << std::endl;
+	// std::cout << "------------------------" << std::endl;
 
 	// auto it = list.begin();
 	// std::cout << "it: " << *it << std::endl; ++it;

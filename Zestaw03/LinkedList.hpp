@@ -1,20 +1,22 @@
 #include <stdexcept>
+#include <cassert>
 
 template<class T>
 class List {
 private:
 	class Node;
-	Node m_guard;
+	Node* m_guard;
 	int m_size = 0;
 
 public:
 	class iterator;
+	class const_iterator;
 	List ();
 	List (const List<T>& other);
 	List (List<T>&& other);
 	~List ();
-	List operator=(const List<T>& other);
-	List operator=(List<T>&& other);
+	List& operator=(const List<T>& other);
+	List& operator=(List<T>&& other);
 
 	// Uniwersalna referencja U&&, Wstawia element na początek listy
 	template<class U>
@@ -33,8 +35,14 @@ public:
 	// Zwraca iterator wskazujący na pierwszy element
 	iterator begin();
 
+	// Zwraca const_iterator wskazujący na pierwszy element
+	const_iterator begin() const;
+
 	// Zwraca iterator wskazujący na ostatni element
 	iterator end();
+
+	// Zwraca const_iterator wskazujący na ostatni element
+	const_iterator end() const;
 
 	// Wyszukuje element o wartości "x" i zwraca jego pozycję
 	iterator find(const T& x);
@@ -62,22 +70,26 @@ public:
 
 template<class T>
 class List<T>::Node {
+protected:
+	Node() : prev(this), next(this) {}
+	Node(const T& v) : value(v) {}
+	Node(T&& v) : value(std::move(v)) {}
 public:
+	friend List;
+	// friend iterator;
+	// friend const_iterator;
 	T value;
 	Node* prev;
 	Node* next;
-	Node() {};
-	Node(const T& v) : value(v) {}
-	Node(T&& v) : value(std::move(v)) {}
 };
 
 template<class T>
 class List<T>::iterator {
-private:
+protected:
 	Node* m_guard;
 	Node* m_ptr;
-	iterator() = delete;
-	iterator(List* list, Node* m_ptr) : m_guard(&list->m_guard), m_ptr(m_ptr) {}
+	iterator() = default;
+	iterator(List* list, Node* ptr);
 public:
 	friend List;
 	T& operator*() const;
@@ -87,36 +99,44 @@ public:
 	bool operator!=(const iterator& other) const;
 };
 
+template<class T>
+class List<T>::const_iterator : public List<T>::iterator {
+protected:
+	const_iterator(const List* list, const Node* ptr);
+public:
+	friend List;
+	const T& operator*() const;
+};
 
 //-----------------------------------------------------------------------------
 
 template<class T>
 List<T>::List() {
-	this->m_guard.next = &this->m_guard;
-	this->m_guard.prev = &this->m_guard;
+	this->m_guard = new Node();
 }
 
 template<class T>
 List<T>::List(const List<T>& other) {
+	this->m_guard = new Node();
 	*this = other;
 }
 
 template<class T>
 List<T>::List(List<T>&& other) {
+	this->m_guard = new Node();
 	*this = std::move(other);
 }
 
 template<class T>
 List<T>::~List() {
 	this->clear();
+	delete this->m_guard;
 }
 
 template<class T>
-List<T> List<T>::operator=(const List<T>& other) {
-	if (&other == this)
-		return *this;
-
+List<T>& List<T>::operator=(const List<T>& other) {
 	this->clear();
+	
 	for(const auto& value : other)
 		this->push_back(value);
 
@@ -124,17 +144,20 @@ List<T> List<T>::operator=(const List<T>& other) {
 }
 
 template<class T>
-List<T> List<T>::operator=(List<T>&& other) {
+List<T>& List<T>::operator=(List<T>&& other) {
 	if (&other == this)
 		return *this;
 
 	this->clear();
+	Node* tmp = this->m_guard;
+	
 	this->m_size = other.m_size;
 	this->m_guard = other.m_guard;
 
 	other.m_size = 0;
-	other.m_guard.next = &other.m_guard;
-	other.m_guard.prev = &other.m_guard;
+	other.m_guard = tmp;
+	other.m_guard->next = tmp;
+	other.m_guard->prev = tmp;
 
 	return *this;
 }
@@ -170,13 +193,25 @@ T List<T>::pop_back() {
 }
 
 template<class T>
+typename List<T>::const_iterator List<T>::begin() const {
+	const Node* n = this->m_guard->next;
+	return List<T>::const_iterator(this, n);
+}
+
+template<class T>
 typename List<T>::iterator List<T>::begin() {
-	return List<T>::iterator(this, this->m_guard.next);
+	return List<T>::iterator(this, this->m_guard->next);
+}
+
+template<class T>
+typename List<T>::const_iterator List<T>::end() const {
+	const Node* n = this->m_guard;
+	return List<T>::const_iterator(this, n);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::end() {
-	return List<T>::iterator(this, &this->m_guard);
+	return List<T>::iterator(this, this->m_guard);
 }
 
 template<class T>
@@ -244,13 +279,36 @@ bool List<T>::empty() const {
 
 template<class T>
 void List<T>::clear() {
-	for (auto it = this->begin(); it != this->end(); ++it) {
+	for (auto it = this->begin(); it != this->end(); ++it)
 		erase(it);
-	}
+
+	assert(this->m_size == 0);
+	assert(this->m_guard->next == this->m_guard);
+	assert(this->m_guard->prev == this->m_guard);
+}
+
+template<class T>
+List<T>::iterator::iterator(List* list, Node* ptr)
+	: m_guard(list->m_guard)
+	, m_ptr(ptr)
+{}
+
+template<class T>
+List<T>::const_iterator::const_iterator(const List* list, const Node* ptr) {
+	this->m_guard = const_cast<Node*>(list->m_guard);
+	this->m_ptr = const_cast<Node*>(ptr);
 }
 
 template<class T>
 T& List<T>::iterator::operator*() const {
+	if (this->m_guard == this->m_ptr)
+		throw std::out_of_range("can't dereference out of range iterator");
+
+	return this->m_ptr->value;
+}
+
+template<class T>
+const T& List<T>::const_iterator::operator*() const {
 	if (this->m_guard == this->m_ptr)
 		throw std::out_of_range("can't dereference out of range iterator");
 
