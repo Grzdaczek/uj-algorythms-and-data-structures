@@ -16,6 +16,9 @@ HPP		+= ArrayList.hpp
 
 all: ArrayList.x # CursorList.x Generator.x
 
+run: all
+	./ArrayList.x
+
 %.x: %.o
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)

@@ -42,7 +42,7 @@ public:
 };
 
 int main() {
-	// auto a = S(10);
+	auto a = S(10);
 
 	std::cout << "------------------ begin" << std::endl;
 
@@ -51,33 +51,13 @@ int main() {
 	#define print std::cout << "[ "; for (const auto& it : l) { std::cout << it << " ";} std::cout << "]" << std::endl
 
 	std::cout << "------------------ 1" << std::endl;
-	// l.push_back(10);
-	// l.push_back(1);
-	// l.push_back(42);
-	// l.push_back(1);
-	// l.push_front(1);
-	// l.push_front(2);
-	// l.push_front(3);
-	// l.push_front(4);
-	// l.push_front(1);
 	l.push_front(1);
-	l.push_front(1);
-	std::cout << "size: " << l.size() << std::endl;
 
+	std::cout << "size: " << l.size() << std::endl;
 	print;
 
 	std::cout << "------------------ 2" << std::endl;
-	l.remove(1);
 	print;
-	std::cout << "size: " << l.size() << std::endl;
-	std::cout << "v: " << l.pop_front() << std::endl;
-	std::cout << "size: " << l.size() << std::endl;
-	std::cout << "v: " << l.pop_front() << std::endl;
-	std::cout << "size: " << l.size() << std::endl;
-	std::cout << "v: " << l.pop_back() << std::endl;
-	std::cout << "size: " << l.size() << std::endl;
-
-	l.clear();
 
 	std::cout << "------------------ end" << std::endl;
 

@@ -106,14 +106,12 @@ template<class T>
 void List<T>::allocate() {
 	std::cout << "-malloc" << std::endl;
 	this->m_arr = (T*) std::malloc(sizeof(T) * this->m_capacity * 1000000);
-	// this->m_arr = new T[this->m_capacity];
 }
 
 template<class T>
 void List<T>::deallocate() {
 	std::cout << "-free" << std::endl;
 	std::free(this->m_arr);
-	// delete this->m_arr;
 }
 
 //-----------------------------------------------------------------------------
@@ -136,7 +134,7 @@ List<T>::List(const List<T>& other)
 	, m_arr(nullptr)
 {
 	std::cout << "-copy constructor" << std::endl;
-   
+
 	*this = other;
 }
 
@@ -147,7 +145,7 @@ List<T>::List(List<T>&& other)
 	, m_arr(nullptr)
 {
 	std::cout << "-move constructor" << std::endl;
-   
+
 	*this = std::move(other);
 }
 
@@ -256,7 +254,7 @@ typename List<T>::const_iterator List<T>::find(const T& x) const {
 
 template<class T>
 typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
-	std::cout << "iterator: " << it.m_index << std::endl;
+	std::cout << "-erase" << std::endl;
 
 	int& index = it.m_index;
 	T* ptr = &this->m_arr[index];
@@ -287,17 +285,19 @@ typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
 
 template<class T>
 int List<T>::remove(const T& x) {
-	std::cout << "-remove" << std::endl;
+	if (this->empty())
+		return 0;
 
 	int n = 0;
-
-	for (auto it = this->begin(); it != this->end(); ++it) {
+	auto it = this->end();
+	do {
+		--it;
 		if (*it == x) {
 			erase(it);
-			n ++;
+			n++;
 		}
-	}
-	
+	} while (it != this->begin());
+
 	return n;
 }
 
@@ -316,7 +316,7 @@ void List<T>::clear() {
 	assert(this->m_arr != nullptr);
 
 	while (!this->empty())
-		this->erase(this->end());
+		this->erase(--this->end());
 
 	assert(this->m_size == 0);
 }
@@ -335,20 +335,24 @@ List<T>::const_iterator::const_iterator(const List* list, int index) {
 
 template<class T>
 T& List<T>::iterator::operator*() const {
-	// if (...)
-		// throw std::out_of_range("can't dereference out of range iterator");
+	if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
+		throw std::out_of_range("can't dereference out of range iterator");
+
 	return this->m_list->m_arr[this->m_index];
 }
 
 template<class T>
 const T& List<T>::const_iterator::operator*() const {
+	if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
+		throw std::out_of_range("can't dereference out of range iterator");
+
 	return this->m_list->m_arr[this->m_index];
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator++() {
-	if (*this == this->m_list->end())
-		return *this;
+	if (this->m_index >= this->m_list->m_size)
+		return this->m_list->end();
 
 	this->m_index ++;
 	return *this;
@@ -356,8 +360,8 @@ typename List<T>::iterator List<T>::iterator::operator++() {
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator--() {
-	if (*this == this->m_list->begin())
-		return *this;
+	if (this->m_index <= 0)
+		return this->m_list->begin();
 
 	this->m_index --;
 	return *this;
