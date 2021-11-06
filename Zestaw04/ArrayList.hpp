@@ -1,12 +1,16 @@
 #include <stdexcept>
+#include <cstring>
+#include <memory>
 #include <cassert>
 
 template<class T>
 class List {
 private:
-    T* m_arr;
-    int m_size;
-    int m_capacity;
+	int m_size;
+	int m_capacity;
+	T* m_arr = nullptr;
+	void allocate();
+	void deallocate();
 
 public:
 	class iterator;
@@ -74,8 +78,10 @@ public:
 template<class T>
 class List<T>::iterator {
 protected:
+	int m_index;
+	const List* m_list;
 	iterator() = default;
-	// TODO: iterator(List* list, Node* ptr);
+	iterator(List* list, int index);
 public:
 	friend List;
 	T& operator*() const;
@@ -88,7 +94,7 @@ public:
 template<class T>
 class List<T>::const_iterator : public List<T>::iterator {
 protected:
-	// TODO: const_iterator(const List* list, const Node* ptr);
+	const_iterator(const List* list, int index);
 public:
 	friend List;
 	const T& operator*() const;
@@ -97,111 +103,202 @@ public:
 //-----------------------------------------------------------------------------
 
 template<class T>
+void List<T>::allocate() {
+	std::cout << "-malloc" << std::endl;
+	this->m_arr = (T*) std::malloc(sizeof(T) * this->m_capacity * 1000000);
+	// this->m_arr = new T[this->m_capacity];
+}
+
+template<class T>
+void List<T>::deallocate() {
+	std::cout << "-free" << std::endl;
+	std::free(this->m_arr);
+	// delete this->m_arr;
+}
+
+//-----------------------------------------------------------------------------
+
+template<class T>
 List<T>::List()
-    : m_size(0)
-    , m_capacity(1024)
+	: m_size(0)
+	, m_capacity(64)
+	, m_arr(nullptr)
 {
-    this->m_arr = new T[this->m_capacity];
+	std::cout << "-constructor" << std::endl;
+
+	this->allocate();
 }
 
 template<class T>
-List<T>::List(const List<T>& other) {
-   this = other; 
+List<T>::List(const List<T>& other)
+	: m_size(0)
+	, m_capacity(64)
+	, m_arr(nullptr)
+{
+	std::cout << "-copy constructor" << std::endl;
+   
+	*this = other;
 }
 
 template<class T>
-List<T>::List(List<T>&& other) {
-   this = std::move(other); 
+List<T>::List(List<T>&& other)
+	: m_size(0)
+	, m_capacity(64)
+	, m_arr(nullptr)
+{
+	std::cout << "-move constructor" << std::endl;
+   
+	*this = std::move(other);
 }
 
 template<class T>
 List<T>::~List() {
-    delete this->m_arr;
+	std::cout << "-delete" << std::endl;
+
+	this->clear();
+	this->deallocate();
 }
 
 template<class T>
 List<T>& List<T>::operator=(const List<T>& other) {
-    this->m_size = other.m_size;
-    this->m_capacity = other.m_capacity;
+	this->m_capacity = other.m_capacity;
+	this->m_size = other.m_size;
+	this->allocate();
 
-    // TODO: Finish
+	for (auto el : other)
+		this->push_back(el);
+
+	return *this;
 }
 
 template<class T>
 List<T>& List<T>::operator=(List<T>&& other) {
-    this->m_arr = other.m_arr;
-    this->m_size = other.m_size;
-    this->m_capacity = other.m_capacity;
+	this->clear();
 
-    other.m_arr = nullptr;
+	this->m_arr = other.m_arr;
+	this->m_size = other.m_size;
+	this->m_capacity = other.m_capacity;
+
+	other.m_arr = nullptr;
+
+	return *this;
 }
 
 template<class T>
 template<class U>
 void List<T>::push_front(U&& x) {
-    // TODO: Implement
+	auto it = this->begin();
+	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 template<class U>
 void List<T>::push_back(U&& x) {
-    // TODO: Implement
+	auto it = this->end();
+	this->insert(it, std::forward<U>(x));
 }
 
 template<class T>
 T List<T>::pop_front() {
-    // TODO: Implement
+	auto it = this->begin();
+	T element = *it;
+	this->erase(it);
+	return element;
 }
 
 template<class T>
 T List<T>::pop_back() {
-    // TODO: Implement
+	auto it = --this->end();
+	T element = *it;
+	this->erase(it);
+	return element;
 }
 
 template<class T>
 typename List<T>::const_iterator List<T>::begin() const {
-    // TODO: Implement
+	return List<T>::const_iterator(this, 0);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::begin() {
-    // TODO: Implement
+	return List<T>::iterator(this, 0);
 }
 
 template<class T>
 typename List<T>::const_iterator List<T>::end() const {
-    // TODO: Implement
+	return List<T>::const_iterator(this, this->m_size);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::end() {
-    // TODO: Implement
+	return List<T>::iterator(this, this->m_size);
 }
 
 template<class T>
 typename List<T>::iterator List<T>::find(const T& x) {
-    // TODO: Implement
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x)
+			return it;
+	}
+
+	return this->end();
 }
 
 template<class T>
 typename List<T>::const_iterator List<T>::find(const T& x) const {
-    // TODO: Implement
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x)
+			return it;
+	}
+
+	return this->end();
 }
 
 template<class T>
 typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
-    // TODO: Implement
+	std::cout << "iterator: " << it.m_index << std::endl;
+
+	int& index = it.m_index;
+	T* ptr = &this->m_arr[index];
+
+	(*it).~T();
+
+	if (it != this->end())
+		std::memmove(ptr, ptr + 1, sizeof(T) * (m_size - index));
+
+	this->m_size--;
+	return --it;
 }
 
 template<class T>
 template<class U>
 typename List<T>::iterator List<T>::insert(List<T>::iterator it, U&& x) {
-    // TODO: Implement
+	int& index = it.m_index;
+	T* ptr = &this->m_arr[index];
+
+	if (it != this->end())
+		std::memmove(ptr + 1, ptr, sizeof(T) * (m_size - index));
+
+	new (ptr) T(std::forward<U>(x));
+
+	this->m_size++;
+	return ++it;
 }
 
 template<class T>
 int List<T>::remove(const T& x) {
-    // TODO: Implement
+	std::cout << "-remove" << std::endl;
+
+	int n = 0;
+
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		if (*it == x) {
+			erase(it);
+			n ++;
+		}
+	}
+	
+	return n;
 }
 
 template<class T>
@@ -216,42 +313,59 @@ bool List<T>::empty() const {
 
 template<class T>
 void List<T>::clear() {
-    // TODO: Implement
+	assert(this->m_arr != nullptr);
+
+	while (!this->empty())
+		this->erase(this->end());
+
+	assert(this->m_size == 0);
 }
 
 template<class T>
-List<T>::iterator::iterator(List* list, Node* ptr) {
-    // TODO: Implement
+List<T>::iterator::iterator(List* list, int index) {
+	this->m_list = list;
+	this->m_index = index;
 }
 
 template<class T>
-List<T>::const_iterator::const_iterator(const List* list, const Node* ptr) {
-    // TODO: Implement
+List<T>::const_iterator::const_iterator(const List* list, int index) {
+	this->m_list = list;
+	this->m_index = index;
 }
 
 template<class T>
 T& List<T>::iterator::operator*() const {
-    // TODO: Implement
+	// if (...)
+		// throw std::out_of_range("can't dereference out of range iterator");
+	return this->m_list->m_arr[this->m_index];
 }
 
 template<class T>
 const T& List<T>::const_iterator::operator*() const {
-    // TODO: Implement
+	return this->m_list->m_arr[this->m_index];
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator++() {
-    // TODO: Implement
+	if (*this == this->m_list->end())
+		return *this;
+
+	this->m_index ++;
+	return *this;
 }
 
 template<class T>
 typename List<T>::iterator List<T>::iterator::operator--() {
-    // TODO: Implement
+	if (*this == this->m_list->begin())
+		return *this;
+
+	this->m_index --;
+	return *this;
 }
 
 template<class T>
 bool List<T>::iterator::operator==(const List<T>::iterator& other) const {
-	return this->m_ptr == other.m_ptr;
+	return this->m_index == other.m_index;
 }
 
 template<class T>

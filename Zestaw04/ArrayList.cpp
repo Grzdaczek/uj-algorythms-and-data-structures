@@ -2,12 +2,93 @@
 #include <sstream> 
 #include "ArrayList.hpp"
 
+class S {
+public:
+	int m_value = 0;
+
+	S() {
+		std::cout << "\t--created" << std::endl;
+	}
+	
+	S(int v) : m_value(v) {
+		std::cout << "\t--created" << std::endl;
+	}
+
+	S(const S& other) : m_value(other.m_value) {
+		std::cout << "\t--copied con" << std::endl;
+	}
+	
+	S(S&& other) : m_value(other.m_value) {
+		other.m_value = 0;
+		std::cout << "\t--moved con" << std::endl;
+	}
+
+	~S() {
+		std::cout << "\t--destroyed" << std::endl;
+	}
+
+	S operator=(const S& other) {
+		this->m_value = other.m_value;
+		std::cout << "\t--copied op" << std::endl;
+		return *this;
+	}
+
+	S operator=(S&& other) {
+		this->m_value = other.m_value;
+		other.m_value = 0;
+		std::cout << "--moved op" << std::endl;
+		return *this;
+	}
+};
+
 int main() {
+	// auto a = S(10);
+
+	std::cout << "------------------ begin" << std::endl;
+
+	List<int> l;
+
+	#define print std::cout << "[ "; for (const auto& it : l) { std::cout << it << " ";} std::cout << "]" << std::endl
+
+	std::cout << "------------------ 1" << std::endl;
+	// l.push_back(10);
+	// l.push_back(1);
+	// l.push_back(42);
+	// l.push_back(1);
+	// l.push_front(1);
+	// l.push_front(2);
+	// l.push_front(3);
+	// l.push_front(4);
+	// l.push_front(1);
+	l.push_front(1);
+	l.push_front(1);
+	std::cout << "size: " << l.size() << std::endl;
+
+	print;
+
+	std::cout << "------------------ 2" << std::endl;
+	l.remove(1);
+	print;
+	std::cout << "size: " << l.size() << std::endl;
+	std::cout << "v: " << l.pop_front() << std::endl;
+	std::cout << "size: " << l.size() << std::endl;
+	std::cout << "v: " << l.pop_front() << std::endl;
+	std::cout << "size: " << l.size() << std::endl;
+	std::cout << "v: " << l.pop_back() << std::endl;
+	std::cout << "size: " << l.size() << std::endl;
+
+	l.clear();
+
+	std::cout << "------------------ end" << std::endl;
+
+	return 0;
+
 	List<int> list;
 
 	std::string line;
 	std::getline(std::cin, line);
     int op = std::stoi(line);
+
 
 	for(int i = 0; i < op; i++) {
 		std::getline(std::cin, line);
