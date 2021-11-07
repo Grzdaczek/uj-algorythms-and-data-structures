@@ -42,27 +42,6 @@ public:
 };
 
 int main() {
-	auto a = S(10);
-
-	std::cout << "------------------ begin" << std::endl;
-
-	List<int> l;
-
-	#define print std::cout << "[ "; for (const auto& it : l) { std::cout << it << " ";} std::cout << "]" << std::endl
-
-	std::cout << "------------------ 1" << std::endl;
-	l.push_front(1);
-
-	std::cout << "size: " << l.size() << std::endl;
-	print;
-
-	std::cout << "------------------ 2" << std::endl;
-	print;
-
-	std::cout << "------------------ end" << std::endl;
-
-	return 0;
-
 	List<int> list;
 
 	std::string line;

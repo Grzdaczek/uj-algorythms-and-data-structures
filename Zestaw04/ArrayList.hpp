@@ -9,8 +9,8 @@ private:
 	int m_size;
 	int m_capacity;
 	T* m_arr = nullptr;
-	void allocate();
-	void deallocate();
+	void alloc();
+	void free();
 
 public:
 	class iterator;
@@ -103,67 +103,65 @@ public:
 //-----------------------------------------------------------------------------
 
 template<class T>
-void List<T>::allocate() {
-	std::cout << "-malloc" << std::endl;
-	this->m_arr = (T*) std::malloc(sizeof(T) * this->m_capacity * 1000000);
+void List<T>::alloc() {
+	this->m_arr = (T*) std::malloc(sizeof(T) * this->m_capacity);
 }
 
 template<class T>
-void List<T>::deallocate() {
-	std::cout << "-free" << std::endl;
+void List<T>::free() {
 	std::free(this->m_arr);
 }
-
-//-----------------------------------------------------------------------------
 
 template<class T>
 List<T>::List()
 	: m_size(0)
-	, m_capacity(64)
-	, m_arr(nullptr)
+	, m_capacity(1024)
 {
-	std::cout << "-constructor" << std::endl;
-
-	this->allocate();
+	this->alloc();
 }
 
 template<class T>
 List<T>::List(const List<T>& other)
 	: m_size(0)
-	, m_capacity(64)
-	, m_arr(nullptr)
+	, m_capacity(other.m_capacity)
 {
-	std::cout << "-copy constructor" << std::endl;
-
-	*this = other;
+	this->alloc();
+	
+	for (const auto& el : other)
+		this->push_back(el);
 }
 
 template<class T>
 List<T>::List(List<T>&& other)
-	: m_size(0)
-	, m_capacity(64)
-	, m_arr(nullptr)
+	: m_size(other.m_size)
+	, m_capacity(other.m_capacity)
+	, m_arr(other.m_arr)
 {
-	std::cout << "-move constructor" << std::endl;
-
-	*this = std::move(other);
+	other.m_arr = nullptr;
+	other.m_size = 0;
+	other.m_capacity = 0;
 }
 
 template<class T>
 List<T>::~List() {
-	std::cout << "-delete" << std::endl;
+	if (this->m_arr == nullptr)
+		return;
 
 	this->clear();
-	this->deallocate();
+	this->free();
 }
 
 template<class T>
 List<T>& List<T>::operator=(const List<T>& other) {
-	this->m_capacity = other.m_capacity;
-	this->m_size = other.m_size;
-	this->allocate();
+	this->clear();
 
-	for (auto el : other)
+	if (this->m_capacity != other.m_capacity) {
+		this->free();
+		this->m_capacity == other.m_capacity;
+		this->alloc();
+	}
+
+	for (const auto& el : other)
 		this->push_back(el);
 
 	return *this;
@@ -171,6 +169,7 @@ List<T>& List<T>::operator=(const List<T>& other) {
 
 template<class T>
 List<T>& List<T>::operator=(List<T>&& other) {
+	this->free();
 	this->clear();
 
 	this->m_arr = other.m_arr;
@@ -178,6 +177,8 @@ List<T>& List<T>::operator=(List<T>&& other) {
 	this->m_capacity = other.m_capacity;
 
 	other.m_arr = nullptr;
+	other.m_size = 0;
+	other.m_capacity = 0;
 
 	return *this;
 }
@@ -254,8 +255,6 @@ typename List<T>::const_iterator List<T>::find(const T& x) const {
 
 template<class T>
 typename List<T>::iterator List<T>::erase(List<T>::iterator it) {
-	std::cout << "-erase" << std::endl;
-
 	int& index = it.m_index;
 	T* ptr = &this->m_arr[index];
 
@@ -313,8 +312,6 @@ bool List<T>::empty() const {
 
 template<class T>
 void List<T>::clear() {
-	assert(this->m_arr != nullptr);
-
 	while (!this->empty())
 		this->erase(--this->end());
 
