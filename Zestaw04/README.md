@@ -1,3 +1,3 @@
-# Zestaw 3
+# Zestaw 4
 
-## Lista z dowiązaniami
+## Lista tablicowa oraz kursorowa
