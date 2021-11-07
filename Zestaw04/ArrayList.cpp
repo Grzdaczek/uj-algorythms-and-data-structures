@@ -102,13 +102,14 @@ int main() {
 			case 'R': {
 				fetch_arg(arg);
 				int x = std::stoi(arg);
-				auto it = list.find(x); 
 
+				fetch_arg(arg);
+				int y = std::stoi(arg);
+
+				auto it = list.find(x); 
 				if (it != list.end()) {
-					fetch_arg(arg);
-					int y = std::stoi(arg);
-					list.insert(it, y);
 					list.erase(it);
+					list.insert(it, y);
 					std::cout << "TRUE" << std::endl;
 				}
 				else {
