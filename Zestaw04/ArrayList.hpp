@@ -20,13 +20,13 @@ private:
 		std::free(this->m_arr);
 	}
 
-	struct m_list_iterator {
+	struct m_ListIterator {
 		const List* m_list;
 		int m_index;
 
-		m_list_iterator() = delete;
+		m_ListIterator() = default;
 
-		m_list_iterator(const List* list, int index)
+		m_ListIterator(const List* list, int index)
 			: m_list(list)
 			, m_index(index)
 		{}
@@ -35,89 +35,24 @@ private:
 			return this->m_list->m_arr[this->m_index];
 		}
 
-		m_list_iterator& operator++() {
+		m_ListIterator& operator++() {
 			this->m_index ++;
 			return *this;
 		}
 
-		m_list_iterator& operator--() {
+		m_ListIterator& operator--() {
 			this->m_index --;
 			return *this;
 		}
 
-		bool operator==(const m_list_iterator& other) const {
+		bool operator==(const m_ListIterator& other) const {
 			return m_index == other.m_index;
 		}
 	};
 
 public:
-
-	typedef nsd::m_base_iterator<m_list_iterator, T> iterator;
-	typedef nsd::const_iterator<m_list_iterator, T> const_iterator;
-
-	// class iterator {
-	// protected:
-	// 	int m_index;
-	// 	const List* m_list;
-	// 	iterator() = default;
-		
-	// 	iterator(List* list, int index) {
-	// 		this->m_list = list;
-	// 		this->m_index = index;
-	// 	}
-
-	// public:
-	// 	friend List;
-	
-	// 	T& operator*() const {
-	// 		if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
-	// 			throw std::out_of_range("can't dereference out of range iterator");
-
-	// 		return this->m_list->m_arr[this->m_index];
-	// 	}
-
-	// 	iterator operator++() {
-	// 		if (this->m_index >= this->m_list->m_size)
-	// 			return this->m_list->end();
-
-	// 		this->m_index ++;
-	// 		return *this;
-	// 	}
-
-	// 	iterator operator--() {
-	// 		if (this->m_index <= 0)
-	// 			return this->m_list->begin();
-
-	// 		this->m_index --;
-	// 		return *this;
-	// 	}
-
-	// 	bool operator==(const List<T>::iterator& other) const {
-	// 		return this->m_index == other.m_index;
-	// 	}
-
-	// 	bool operator!=(const List<T>::iterator& other) const {
-	// 		return !(*this == other);
-	// 	}
-	// };
-
-	// class const_iterator : public iterator {
-	// protected:
-	// 	const_iterator(const List* list, int index) {
-	// 		this->m_list = list;
-	// 		this->m_index = index;
-	// 	}
-
-	// public:
-	// 	friend List;
-		
-	// 	const T& operator*() const {
-	// 		if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
-	// 			throw std::out_of_range("can't dereference out of range iterator");
-
-	// 		return this->m_list->m_arr[this->m_index];
-	// 	}
-	// };
+	typedef nsd::Iterator<m_ListIterator, T> iterator;
+	typedef nsd::ConstIterator<m_ListIterator, T> const_iterator;
 
 	List()
 		: m_size(0)
@@ -216,25 +151,25 @@ public:
 
 	// Zwraca const_iterator wskazujący na pierwszy element
 	const_iterator begin() const {
-		auto it = m_list_iterator(this, 0);
+		auto it = m_ListIterator(this, 0);
 		return const_iterator(it);
 	}
 
 	// Zwraca iterator wskazujący na pierwszy element
 	iterator begin() {
-		auto it = m_list_iterator(this, 0);
+		auto it = m_ListIterator(this, 0);
 		return iterator(it);
 	}
 
 	// Zwraca const_iterator wskazujący na ostatni element
 	const_iterator end() const {
-		auto it = m_list_iterator(this, this->m_size);
+		auto it = m_ListIterator(this, this->m_size);
 		return const_iterator(it);
 	}
 
 	// Zwraca iterator wskazujący na ostatni element
 	iterator end() {
-		auto it = m_list_iterator(this, this->m_size);
+		auto it = m_ListIterator(this, this->m_size);
 		return iterator(it);
 	}
 
