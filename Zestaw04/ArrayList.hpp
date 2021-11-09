@@ -3,6 +3,8 @@
 #include <memory>
 #include <cassert>
 
+#include "iterator.hpp"
+
 template<class T>
 class List {
 private:
@@ -18,71 +20,104 @@ private:
 		std::free(this->m_arr);
 	}
 
-public:
-
-	class iterator {
-	protected:
-		int m_index;
+	struct m_list_iterator {
 		const List* m_list;
-		iterator() = default;
-		
-		iterator(List* list, int index) {
-			this->m_list = list;
-			this->m_index = index;
-		}
+		int m_index;
 
-	public:
-		friend List;
-	
+		m_list_iterator() = delete;
+
+		m_list_iterator(const List* list, int index)
+			: m_list(list)
+			, m_index(index)
+		{}
+
 		T& operator*() const {
-			if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
-				throw std::out_of_range("can't dereference out of range iterator");
-
 			return this->m_list->m_arr[this->m_index];
 		}
 
-		iterator operator++() {
-			if (this->m_index >= this->m_list->m_size)
-				return this->m_list->end();
-
+		m_list_iterator& operator++() {
 			this->m_index ++;
 			return *this;
 		}
 
-		iterator operator--() {
-			if (this->m_index <= 0)
-				return this->m_list->begin();
-
+		m_list_iterator& operator--() {
 			this->m_index --;
 			return *this;
 		}
 
-		bool operator==(const List<T>::iterator& other) const {
-			return this->m_index == other.m_index;
-		}
-
-		bool operator!=(const List<T>::iterator& other) const {
-			return !(*this == other);
+		bool operator==(const m_list_iterator& other) const {
+			return m_index == other.m_index;
 		}
 	};
 
-	class const_iterator : public iterator {
-	protected:
-		const_iterator(const List* list, int index) {
-			this->m_list = list;
-			this->m_index = index;
-		}
+public:
 
-	public:
-		friend List;
+	typedef nsd::m_base_iterator<m_list_iterator, T> iterator;
+	typedef nsd::const_iterator<m_list_iterator, T> const_iterator;
+
+	// class iterator {
+	// protected:
+	// 	int m_index;
+	// 	const List* m_list;
+	// 	iterator() = default;
 		
-		const T& operator*() const {
-			if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
-				throw std::out_of_range("can't dereference out of range iterator");
+	// 	iterator(List* list, int index) {
+	// 		this->m_list = list;
+	// 		this->m_index = index;
+	// 	}
 
-			return this->m_list->m_arr[this->m_index];
-		}
-	};
+	// public:
+	// 	friend List;
+	
+	// 	T& operator*() const {
+	// 		if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
+	// 			throw std::out_of_range("can't dereference out of range iterator");
+
+	// 		return this->m_list->m_arr[this->m_index];
+	// 	}
+
+	// 	iterator operator++() {
+	// 		if (this->m_index >= this->m_list->m_size)
+	// 			return this->m_list->end();
+
+	// 		this->m_index ++;
+	// 		return *this;
+	// 	}
+
+	// 	iterator operator--() {
+	// 		if (this->m_index <= 0)
+	// 			return this->m_list->begin();
+
+	// 		this->m_index --;
+	// 		return *this;
+	// 	}
+
+	// 	bool operator==(const List<T>::iterator& other) const {
+	// 		return this->m_index == other.m_index;
+	// 	}
+
+	// 	bool operator!=(const List<T>::iterator& other) const {
+	// 		return !(*this == other);
+	// 	}
+	// };
+
+	// class const_iterator : public iterator {
+	// protected:
+	// 	const_iterator(const List* list, int index) {
+	// 		this->m_list = list;
+	// 		this->m_index = index;
+	// 	}
+
+	// public:
+	// 	friend List;
+		
+	// 	const T& operator*() const {
+	// 		if (this->m_index < 0 || this->m_index >= this->m_list->m_size)
+	// 			throw std::out_of_range("can't dereference out of range iterator");
+
+	// 		return this->m_list->m_arr[this->m_index];
+	// 	}
+	// };
 
 	List()
 		: m_size(0)
@@ -181,22 +216,26 @@ public:
 
 	// Zwraca const_iterator wskazujący na pierwszy element
 	const_iterator begin() const {
-		return const_iterator(this, 0);
+		auto it = m_list_iterator(this, 0);
+		return const_iterator(it);
 	}
 
 	// Zwraca iterator wskazujący na pierwszy element
 	iterator begin() {
-		return iterator(this, 0);
+		auto it = m_list_iterator(this, 0);
+		return iterator(it);
 	}
 
 	// Zwraca const_iterator wskazujący na ostatni element
 	const_iterator end() const {
-		return const_iterator(this, this->m_size);
+		auto it = m_list_iterator(this, this->m_size);
+		return const_iterator(it);
 	}
 
 	// Zwraca iterator wskazujący na ostatni element
 	iterator end() {
-		return iterator(this, this->m_size);
+		auto it = m_list_iterator(this, this->m_size);
+		return iterator(it);
 	}
 
 	// Wyszukuje element o wartości "x" i zwraca jego pozycję
@@ -220,7 +259,7 @@ public:
 
 	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
 	iterator erase(iterator it) {
-		int& index = it.m_index;
+		int index = it.base().m_index;
 		T* ptr = &this->m_arr[index];
 
 		(*it).~T();
@@ -235,7 +274,7 @@ public:
 	// Wstawia element "x" przed pozycję "it" i zwraca pozycję "x"
 	template<class U>
 	iterator insert(iterator it, U&& x) {
-		int& index = it.m_index;
+		int index = it.base().m_index;
 		T* ptr = &this->m_arr[index];
 
 		if (it != this->end())

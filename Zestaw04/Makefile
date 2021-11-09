@@ -11,7 +11,8 @@ CXXFLAGS	+= -pedantic
 CXXFLAGS	+= -std=c++17
 
 HPP		+= ArrayList.hpp
-# HPP		+= CursorList.hpp
+HPP		+= CursorList.hpp
+HPP		+= iterator.hpp
 #=-----------------------------------------------------------------------------
 
 all: ArrayList.x # CursorList.x Generator.x
