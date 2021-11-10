@@ -9,73 +9,101 @@ public:
 	class List;
 
 private:
-	typedef typename CursorList<T>::List::m_Node m_Node;
-	m_Node* m_data;
-	List m_empty;
+	class m_ValueNode {
+	public:
+		m_ValueNode* next;
+		T value;
+		m_ValueNode() :				next(nullptr), value(T()) {};
+		m_ValueNode(const T& x) :	next(nullptr), value(x) {};
+		m_ValueNode(T&& x) :		next(nullptr), value(std::move(x)) {};
+	};
+
+	class m_HollowNode {
+	public:
+		m_HollowNode* next;
+		m_HollowNode() : next(nullptr) {};
+	};
+
+	union m_Node {
+		m_HollowNode as_hollow;
+		m_ValueNode as_value;
+	};
+	
 	int m_capacity;
+	int m_nsize;
+	m_HollowNode* m_hollow;
+	m_Node* m_data;
 
-	m_Node* m_alloc() {
-		// TODO: check for free space
-		m_Node* ptr = m_empty.m_head;
-		m_empty.m_head = m_empty.m_head->next;
+	m_ValueNode* m_alloc() {
+		if (full())
+			throw new std::out_of_range("can't alloc, list is full");
+		
+		m_Node* node = reinterpret_cast<m_Node*>(m_hollow);
+		m_hollow = m_hollow->next;
+		m_nsize--;
 
-		// TODO: fix memmory leak, m_empty node value never gets destroyed
-		return ptr;
+		// Different union members should have the same raw address
+		assert((void*)node == (void*)&(node->as_value));
+		assert((void*)node == (void*)&(node->as_hollow));
+
+		return &node->as_value;
 	}
 
-	void m_free(m_Node* node) {
+	void m_free(m_ValueNode* node) {
+		if (empty())
+			throw new std::out_of_range("can't free, list is empty");
 
+		m_HollowNode* new_hollow = reinterpret_cast<m_HollowNode*>(node);
+		new_hollow->next = m_hollow;
+		m_hollow = new_hollow;
 	}
 
 public:
 	#define __DEFAULT_SIZE 10
 	CursorList()
-		: m_data(new m_Node[__DEFAULT_SIZE])
-		, m_empty(List(this))
-		, m_capacity(__DEFAULT_SIZE)
+		: m_capacity(__DEFAULT_SIZE)
+		, m_nsize(m_capacity)
+		, m_hollow(nullptr)
+		, m_data(reinterpret_cast<m_Node*>(new m_HollowNode[m_nsize]))
 	{
-		for (int i = 0; i < m_capacity - 1; ++i)
-			m_data[i].next = &m_data[i + 1];
-		
-		for (int i = 0; i < m_capacity; ++i)
-			m_data[i].value = i;
+		for (int i = 0; i < m_nsize - 1; ++i)
+			m_data[i].as_hollow.next = reinterpret_cast<m_HollowNode*>(&m_data[i+1]);
 
-		m_empty.m_head = &m_data[0];
-		m_empty.m_tail = &m_data[m_capacity - 1];
+		m_hollow = &m_data[0].as_hollow;
 	}
 
 	List create() {
 		return List(this);
 	}
 
-#if !NDEBUG
-	List __emptyList() { return m_empty; }
-#endif
+	int size() {
+		return m_capacity - m_nsize;
+	}
+
+	bool empty() {
+		return m_nsize == m_capacity;
+	}
+
+	bool full() {
+		assert(m_nsize == 0 ? (m_hollow == nullptr) : true);
+		return m_nsize == 0;
+	}
 
 };
 
 template<class T>
 class CursorList<T>::List {
 private:
-	class m_Node {
-	public:
-		T value;
-		m_Node* next;
-		m_Node() : value(T()), next(nullptr) {};
-		m_Node(const T& x) : value(x), next(nullptr) {};
-		m_Node(T&& x) : value(std::move(x)), next(nullptr) {};
-	};
-
 	class m_Iterator {
 	private:
-		m_Node* m_nodeptr;
+		m_ValueNode* m_nodeptr;
 
 	public:
 		friend CursorList;
 		
 		m_Iterator() = default;
 
-		m_Iterator(m_Node* nodeptr)
+		m_Iterator(m_ValueNode* nodeptr)
 			: m_nodeptr(nodeptr)
 		{}
 
@@ -95,8 +123,8 @@ private:
 	
 	CursorList* const m_parent;
 	int m_size;
-	m_Node* m_head;
-	m_Node* m_tail;
+	m_ValueNode* m_head;
+	m_ValueNode* m_tail;
 	
 public:
 	friend CursorList;
@@ -140,7 +168,7 @@ public:
 	Iterator insert(Iterator it, U&& x) {
 		std::cout << "-insert" << std::endl;
 
-		m_Node* nodeptr = new (m_parent->m_alloc()) m_Node(std::forward<U>(x));
+		m_ValueNode* nodeptr = new (m_parent->m_alloc()) m_ValueNode(std::forward<U>(x));
 		
 		if (!m_size) {
 			// When list is empty, these should be nullptr
@@ -171,7 +199,7 @@ public:
 					++prev;
 				}
 
-				m_Node* prevptr = it.unwrap().m_nodeptr;
+				m_ValueNode* prevptr = it.unwrap().m_nodeptr;
 				nodeptr->next = prevptr->next;
 				prevptr->next = nodeptr;
 			}
@@ -182,14 +210,14 @@ public:
 	}
 
 	Iterator erase(Iterator it) {
-		
+
 	}
 
 #if !NDEBUG
 	void __print() {
 		std::cout << "[ ";
 		for (const auto& n : *this)
-			std::cout << n << " ";
+			std::cout << n.m_value << " ";
 
 		std::cout << "]" << std::endl;
 	}
