@@ -65,6 +65,10 @@ namespace nsd {
 		constexpr Iterator(const P& i) noexcept
 			: m_ptr(i)
 		{}
+		
+		constexpr operator ConstIterator<P, T>() const {
+			return static_cast<Iterator>(*this);
+		}
 
 		constexpr bool
 		operator==(const Iterator& other) const noexcept {

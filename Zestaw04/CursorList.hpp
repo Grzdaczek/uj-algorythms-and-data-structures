@@ -3,12 +3,15 @@
 #include <stdexcept>
 #include <cassert>
 
+#define DEBUG true
+
 template<class T>
 class CursorList {
-private:
+public:
 	class List;
-	typedef typename CursorList<T>::List::m_Node m_Node;
 
+private:
+	typedef typename CursorList<T>::List::m_Node m_Node;
 	m_Node* m_data;
 	List m_empty;
 	int m_capacity;
@@ -31,8 +34,10 @@ public:
 		return List(this);
 	}
 
-	// DEBUG
+#if DEBUG
 	List __emptyList() { return m_empty; }
+#endif
+
 };
 
 template<class T>
@@ -91,7 +96,7 @@ public:
 		, m_tail(nullptr)
 	{}
 
-	constexpr Iterator begin() const {
+	constexpr ConstIterator begin() const {
 		return ConstIterator(m_Iterator(m_head));
 	}
 
@@ -99,12 +104,22 @@ public:
 		return Iterator(m_Iterator(m_head));
 	}
 
-	constexpr Iterator end() const {
+	constexpr ConstIterator end() const {
 		return ConstIterator(m_Iterator(nullptr));
 	}
 
 	constexpr Iterator end() {
 		return Iterator(m_Iterator(nullptr));
 	}
+
+#if DEBUG
+	void __print() {
+		std::cout << "[ ";
+		for (const auto& n : *this)
+			std::cout << n << " ";
+
+		std::cout << "]" << std::endl;
+	}
+#endif
 
 };
