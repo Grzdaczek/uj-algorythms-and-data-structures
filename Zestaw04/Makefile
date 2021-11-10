@@ -15,10 +15,10 @@ HPP		+= CursorList.hpp
 HPP		+= iterator.hpp
 #=-----------------------------------------------------------------------------
 
-all: ArrayList.x # CursorList.x Generator.x
+all: ArrayList.x CursorList.x # Generator.x
 
 run: all
-	./ArrayList.x
+	./CursorList.x
 
 %.x: %.o
 	@printf "  LD\t$^\n"

@@ -1,190 +1,110 @@
+#include "iterator.hpp"
+
 #include <stdexcept>
 #include <cassert>
 
 template<class T>
-class List {
+class CursorList {
 private:
-	int m_size;
+	class List;
+	typedef typename CursorList<T>::List::m_Node m_Node;
+
+	m_Node* m_data;
+	List m_empty;
 	int m_capacity;
 
 public:
-
-	class iterator {
-	protected:
-		int m_ptr;
-		const List* m_list;
-		iterator() = default;
+	#define __DEFAULT_SIZE 10
+	CursorList()
+		: m_data(new m_Node[__DEFAULT_SIZE])
+		, m_empty(List(this))
+		, m_capacity(__DEFAULT_SIZE)
+	{
+		for (int i = 0; i < m_capacity - 1; ++i)
+			m_data[i].next = &m_data[i + 1];
 		
-		iterator(List* list, int ptr) {
-			this->m_list = list;
-			this->m_ptr = ptr;
-		}
+		m_empty.m_head = &m_data[0];
+		m_empty.m_tail = &m_data[m_capacity - 1];
+	}
+
+	List create() {
+		return List(this);
+	}
+
+	// DEBUG
+	List __emptyList() { return m_empty; }
+};
+
+template<class T>
+class CursorList<T>::List {
+private:
+	class m_Node {
+	public:
+		T value;
+		m_Node* next;
+		m_Node() : value(T()), next(nullptr) {}; 
+		m_Node(const T& x) : value(x), next(nullptr) {}; 
+		m_Node(T&& x) : value(std::move(x)), next(nullptr) {}; 
+	};
+
+	class m_Iterator {
+	private:
+		m_Node* m_nodeptr;
 
 	public:
-		friend List;
-	
+		m_Iterator() = default;
+
+		m_Iterator(m_Node* nodeptr)
+			: m_nodeptr(nodeptr)
+		{}
+
 		T& operator*() const {
-			// if (...)
-			// 	throw std::out_of_range("can't dereference out of range iterator");
-			// TODO: implement
+			return m_nodeptr->value;
 		}
 
-		iterator operator++() {
-			// TODO: implement
+		m_Iterator& operator++() {
+			this->m_nodeptr = this->m_nodeptr->next;
+			return *this;
 		}
 
-		iterator operator--() {
-			// TODO: implement
-		}
-
-		bool operator==(const List<T>::iterator& other) const {
-			return this->m_ptr == other.m_ptr;
-		}
-
-		bool operator!=(const List<T>::iterator& other) const {
-			return !(*this == other);
+		bool operator==(const m_Iterator& other) const {
+			return m_nodeptr == other.m_nodeptr;
 		}
 	};
+	
+	friend CursorList;
+	CursorList* const m_parent;
+	int m_size;
+	m_Node* m_head;
+	m_Node* m_tail;
+	
+public:
+	typedef nsd::ConstIterator<m_Iterator, T> ConstIterator;
+	typedef nsd::Iterator<m_Iterator, T> Iterator;
 
-	class const_iterator : public iterator {
-	protected:
-		const_iterator(const List* list, int index) {
-			// TODO: implement
-		}
+	List() = delete;
 
-	public:
-		friend List;
-		
-		const T& operator*() const {
-			// if (...)
-			// 	throw std::out_of_range("can't dereference out of range iterator");
-			// TODO: implement
-		}
-	};
+	List(CursorList* const parent)
+		: m_parent(parent)
+		, m_size(0)
+		, m_head(nullptr)
+		, m_tail(nullptr)
+	{}
 
-	List() {
-		// TODO: implement
+	constexpr Iterator begin() const {
+		return ConstIterator(m_Iterator(m_head));
 	}
 
-	List(const List<T>& other) {
-		// TODO: implement
+	constexpr Iterator begin() {
+		return Iterator(m_Iterator(m_head));
 	}
 
-	List(List<T>&& other) {
-		// TODO: implement
+	constexpr Iterator end() const {
+		return ConstIterator(m_Iterator(nullptr));
 	}
 
-	~List() {
-		// TODO: implement
-	}
-
-	List<T>& operator=(const List<T>& other) {
-		// TODO: implement
-	}
-
-	List<T>& operator=(List<T>&& other) {
-		// TODO: implement
-	}
-
-	// Uniwersalna referencja U&&, Wstawia element na początek listy
-	template<class U>
-	void push_front(U&& x) {
-		auto it = this->begin();
-		this->insert(it, std::forward<U>(x));
-	}
-
-	// Wstawia element na koniec listy
-	template<class U>
-	void push_back(U&& x) {
-		auto it = this->end();
-		this->insert(it, std::forward<U>(x));
-	}
-
-	// Usuwa element z początku listy i zwraca jego wartość lub wyrzuca wyjątek gdy lista jest pusta
-	T pop_front() {
-		auto it = this->begin();
-		T element = *it;
-		this->erase(it);
-		return element;
-	}
-
-	// Usuwa element z końca listy i zwraca jego wartość lub wyrzuca wyjątek gdy lista jest pusta
-	T pop_back() {
-		auto it = --this->end();
-		T element = *it;
-		this->erase(it);
-		return element;
-	}
-
-	// Zwraca const_iterator wskazujący na pierwszy element
-	const_iterator begin() const {
-		// TODO: implement
-	}
-
-	// Zwraca iterator wskazujący na pierwszy element
-	iterator begin() {
-		// TODO: implement
-	}
-
-	// Zwraca const_iterator wskazujący na ostatni element
-	const_iterator end() const {
-		// TODO: implement
-	}
-
-	// Zwraca iterator wskazujący na ostatni element
-	iterator end() {
-		// TODO: implement
-	}
-
-	// Wyszukuje element o wartości "x" i zwraca jego pozycję
-	iterator find(const T& x) {
-		for (auto it = this->begin(); it != this->end(); ++it) {
-			if (*it == x)
-				return it;
-		}
-
-		return this->end();
-	}
-
-	const_iterator find(const T& x) const {
-		for (auto it = this->begin(); it != this->end(); ++it) {
-			if (*it == x)
-				return it;
-		}
-
-		return this->end();
-	}
-
-	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
-	iterator erase(iterator it) {
-		// TODO: implement
-	}
-
-	// Wstawia element "x" przed pozycję "it" i zwraca pozycję "x"
-	template<class U>
-	iterator insert(iterator it, U&& x) {
-		// TODO: implement
-	}
-
-	// Usuwa wystąpienia "x" i zwraca ich liczbę
-	int remove(const T& x) {
-		// TODO: implement
-	}
-
-	// Zwraca liczbę elementów w liście
-	int size() const {
-		return this->m_size;
-	}
-
-	// Zwraca true gdy lista jest pusta
-	bool empty() const {
-		return this->size() == 0;
-	}
-
-	// Czyści listę
-	void clear() {
-		// TODO: implement
-		// assert(this->m_size == 0);
+	constexpr Iterator end() {
+		return Iterator(m_Iterator(nullptr));
 	}
 
 };
