@@ -194,7 +194,7 @@ public:
 
 	// Usuwa element wskazywany przez iterator "it" i zwraca iterator do kolejnego elementu
 	iterator erase(iterator it) {
-		int index = it.base().m_index;
+		int index = it.unwrap().m_index;
 		T* ptr = &this->m_arr[index];
 
 		(*it).~T();
@@ -209,7 +209,7 @@ public:
 	// Wstawia element "x" przed pozycję "it" i zwraca pozycję "x"
 	template<class U>
 	iterator insert(iterator it, U&& x) {
-		int index = it.base().m_index;
+		int index = it.unwrap().m_index;
 		T* ptr = &this->m_arr[index];
 
 		if (it != this->end())

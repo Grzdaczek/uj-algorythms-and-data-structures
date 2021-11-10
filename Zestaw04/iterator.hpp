@@ -47,7 +47,7 @@ namespace nsd {
 		}
 
 		constexpr const P&
-		base() const noexcept {
+		unwrap() const noexcept {
 			return this->m_ptr;
 		}
 	};
@@ -103,7 +103,7 @@ namespace nsd {
 		}
 
 		constexpr const P&
-		base() const noexcept {
+		unwrap() const noexcept {
 			return this->m_ptr;
 		}
 	};
