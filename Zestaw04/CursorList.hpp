@@ -120,27 +120,6 @@ public:
 		return sSize = 0;
 	}
 
-	#if !NDEBUG
-	std::string __to_string__() {
-		std::basic_stringstream<char> s;
-		s << "mHead:\t" << mHead << std::endl;
-		s << "mTail:\t" << mTail << std::endl;
-		s << "sCapac:\t" << sCapacity << std::endl;
-		s << "sSize:\t" << sSize << std::endl;
-		s << "sEmpty:\t" << sEmpty << std::endl;
-		s << "sData:\t[" << std::endl;
-
-		for (int i = 0; i < sCapacity; i++)
-			s << "\t" << i << " > "
-				<< valueAt(i).next << ": "
-				<< valueAt(i).value << std::endl;
-
-		s << "]" <<std::endl;
-
-		return s.str();
-	}
-	#endif
-
 	CursorList()
 		: mSize(0)
 		, mHead(-1)
