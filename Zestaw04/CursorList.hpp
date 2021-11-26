@@ -62,9 +62,9 @@ private:
 	inline static int sSize;
 	inline static int sEmpty;
 
+	int mSize;
 	int mHead;
 	int mTail;
-	int mSize;
 
 	static mEmptyNode& emptyAt(int i) {
 		return sData[i].asEmpty;
@@ -141,17 +141,55 @@ public:
 	}
 	#endif
 
-	CursorList() {
+	CursorList()
+		: mSize(0)
+		, mHead(-1)
+		, mTail(-1)
+	{
 		if (!sData)
 			throw new std::out_of_range("");
+	}
 
-		mSize = 0;
-		mHead = -1;
-		mTail = -1;
+	CursorList(const CursorList& other)
+		: mSize(0)
+		, mHead(-1)
+		, mTail(-1)
+	{
+		for (auto el : other)
+			push_back(el);
+	}
+
+	CursorList(CursorList&& other)
+		: mSize(other.mSize)
+		, mHead(other.mHead)
+		, mTail(other.mTail)
+	{
+		other.mSize = 0;
+		other.mHead = -1;
+		other.mTail = -1;
+	}
+
+	CursorList& operator=(const CursorList& other) {
+		clear();
+
+		for (auto el : other)
+			push_back(el);
+	}
+
+	CursorList& operator=(CursorList&& other) {
+		clear();
+
+		mSize = other.mSize;
+		mHead = other.mHead;
+		mTail = other.mTail;
+
+		other.mSize = 0;
+		other.mHead = -1;
+		other.mTail = -1;
 	}
 
 	~CursorList() {
-		// TODO: implement
+		clear();
 	}
 
 	Iterator begin() {
