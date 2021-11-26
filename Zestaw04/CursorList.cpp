@@ -3,7 +3,7 @@
 #include "CursorList.hpp"
 
 int main() {
-	CursorList<int>::alloc(10000);
+	CursorList<int>::alloc(64);
 	CursorList<int> list;
 
 	std::string line;

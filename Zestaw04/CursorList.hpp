@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <cassert>
+#include <cstring>
 
 template<typename T>
 class CursorList {
@@ -88,20 +89,26 @@ public:
 			sData[i].asEmpty.next = i + 1;
 	}
 
-	static void free(int size) {
+	static void free(int capacity) {
 		delete[] sData;
 		sData = nullptr;
 		sCapacity = 0;
 		sSize = 0;
 	}
 
-	static void grow(int size) {
-		// TODO: implement
-		throw new std::out_of_range("Well.. it seems grow is not yet implemented");
-	}
+	static void grow(int capacity) {
+		mNode* data = (mNode*)std::malloc(capacity * sizeof(mNode));
+		std::memmove(data, sData, sCapacity * sizeof(mNode));
+		new (&data[sCapacity]) mNode[capacity - sCapacity];
+		delete[] sData;
+		sData = data;
 
-	static void shrink(int size) {
-		// TODO: implement
+		for (int i = sCapacity; i < capacity - 1; ++i)
+			sData[i].asEmpty.next = i + 1;
+		
+		sData[capacity - 1].asEmpty.next = sEmpty;
+		sEmpty = sCapacity;
+		sCapacity = capacity;
 	}
 
 	static int totalSize() {
