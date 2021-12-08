@@ -16,8 +16,7 @@ CXXFLAGS	+= -march=native
 all: BubbleSort.x InsertionSort.x SelectionSort.x
 
 test: all
-	$(Q)./BubbleSort.x < in.dat > out.dat
-	$(Q)diff exp.dat out.dat --color -q
+	bash test.bash
 
 %.x: %.o
 	@printf "  LD\t$^\n"
