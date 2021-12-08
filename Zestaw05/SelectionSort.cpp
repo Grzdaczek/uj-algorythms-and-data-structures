@@ -3,7 +3,15 @@
 
 template<class T>
 void sort(std::vector<T> &v) {
-	// TODO: implement
+	for (int k = 0; k < (int)v.size(); ++k) {
+		int min = k;
+		
+		for (int i = k + 1; i < (int)v.size(); ++i)
+			if (v[min] > v[i])
+				min = i;
+
+		std::swap(v[k], v[min]);
+	}
 }
 
 int main() {

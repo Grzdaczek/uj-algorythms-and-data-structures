@@ -3,7 +3,14 @@
 
 template<class T>
 void sort(std::vector<T> &v) {
-	// TODO: implement
+	for (int k = 0; k < (int)v.size() - 1; ++k) {
+		int i = k + 1;
+
+		while (i > 0 && v[i-1] > v[i]) {
+			std::swap(v[i-1], v[i]);
+			i--;
+		}
+	}
 }
 
 int main() {
