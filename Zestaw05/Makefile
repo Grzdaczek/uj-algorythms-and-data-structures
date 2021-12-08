@@ -13,7 +13,7 @@ CXXFLAGS	+= -march=native
 
 #=-----------------------------------------------------------------------------
 
-all: BubbleSort.x InsertionSort.x SelectionSort.x
+all: BubbleSort.x InsertionSort.x SelectionSort.x Generator.x
 
 test: all
 	bash test.bash
