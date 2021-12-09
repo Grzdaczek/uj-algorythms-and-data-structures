@@ -22,6 +22,7 @@ test: all
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+.PRECIOUS: %.o
 %.o: %.cpp $(HPP)
 	@printf "  CXX\t$<\n"
 	$(Q)$(CXX) $(CXXFLAGS) -c $< -o $@ 
