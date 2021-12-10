@@ -18,6 +18,9 @@ all: BubbleSort.x InsertionSort.x SelectionSort.x SelectionSortComplexity.x Gene
 test: all
 	$(Q)python3 test.py
 
+chart: SelectionSortComplexity.x
+	$(Q)python3 chart.py
+
 %.x: %.o
 	@printf "  LD\t$^\n"
 	$(Q)$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
