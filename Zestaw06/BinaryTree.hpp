@@ -3,9 +3,6 @@
 #include <functional>
 
 template<typename T>
-class BinaryIterator;
-
-template<typename T>
 class BinaryTree;
 
 template<typename T>
@@ -67,32 +64,9 @@ public:
 };
 
 template<typename T>
-class BinaryIterator {
-private:
-// 	using Node = BinaryNode<T>;
-
-// 	std::vector<Node*> mStack;
-
-// public:
-// 	BinaryIterator(const BinaryTree<T>& tree) {
-// 		if (tree.mRoot == nullptr)
-// 			return;
-
-// 		Node* node = tree.mRoot;
-
-// 		do {
-// 			mStack.push(node);
-// 			node = node->mLeft;
-// 		} while (node);
-
-// 	}
-};
-
-template<typename T>
 class BinaryTree {
 private:
 	using Node = BinaryNode<T>;
-	friend BinaryIterator<T>;
 
 	Node* mRoot = nullptr;
 	int mSize = 0;
@@ -110,7 +84,7 @@ public:
 		Node** node = &mRoot;
 		int depth = 0;
 
-		while (*node) {
+		while (*node != nullptr) {
 			depth += 1;
 
 			if ((*node)->mValue > x)

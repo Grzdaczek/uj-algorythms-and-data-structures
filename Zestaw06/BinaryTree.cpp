@@ -3,10 +3,15 @@
 
 int main() {
 	int x;
+	int len = 0;
 	auto tree = BinaryTree<int>();
 
-	while(std::cin >> x)
+	std::cin >> len;
+
+	for (int i = 0; i < len; ++i) {
+		std::cin >> x;
 		tree.insert(x);
+	}
 
 	std::cout
 		<< tree.size() << " "
@@ -14,7 +19,7 @@ int main() {
 		<< tree.minimum() << " "
 		<< tree.maximum() << std::endl;
 	
-	tree.inorder();
+	tree.preorder();
 
 	for (int i = 1; i < 10; i++)
 		std::cout << (tree.search(i) ? "Yes" : "No") << std::endl;

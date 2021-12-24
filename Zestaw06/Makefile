@@ -12,12 +12,17 @@ CXXFLAGS	+= -std=c++17
 CXXFLAGS	+= -march=native
 
 HPP			+= BinaryTree.hpp
+
 #=-----------------------------------------------------------------------------
 
 all: BinaryTree.x
 
-run: all
-	$(Q)./BinaryTree.x
+test: all
+	$(Q)./BinaryTree.x < tests/input/100.txt > tests/result/100.txt
+	$(Q)./BinaryTree.x < tests/input/10k.txt > tests/result/10k.txt
+	$(Q)./BinaryTree.x < tests/input/15a.txt > tests/result/15a.txt
+	$(Q)./BinaryTree.x < tests/input/15b.txt > tests/result/15b.txt
+	$(Q)diff -rq tests/expected tests/result
 
 %.x: %.o
 	@printf "  LD\t$^\n"
