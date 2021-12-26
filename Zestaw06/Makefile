@@ -23,6 +23,7 @@ test: all
 	$(Q)./BinaryTree.x < tests/input/15a.txt > tests/result/15a.txt
 	$(Q)./BinaryTree.x < tests/input/15b.txt > tests/result/15b.txt
 	$(Q)diff -rq tests/expected tests/result
+	@printf "  TEST\tall tests passed\n"
 
 %.x: %.o
 	@printf "  LD\t$^\n"

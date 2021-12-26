@@ -22,5 +22,5 @@ int main() {
 	tree.preorder();
 
 	for (int i = 1; i < 10; i++)
-		std::cout << (tree.search(i) ? "Yes" : "No") << std::endl;
+		std::cout << (tree.searchRecursive(i) ? "Yes" : "No") << std::endl;
 }

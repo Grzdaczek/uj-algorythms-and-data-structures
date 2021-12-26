@@ -7,59 +7,47 @@ class BinaryTree;
 
 template<typename T>
 class BinaryNode {
-private:
+public:
 	friend BinaryTree<T>;
 	using Node = BinaryNode<T>;
-	T mValue;
-	Node* mLeft;
-	Node* mRight;
 
-public:
+	T value;
+	Node* left;
+	Node* right;
+
 	BinaryNode(const T& x)
-		: mValue(x)
-		, mLeft(nullptr)
-		, mRight(nullptr)
+		: value(x)
+		, left(nullptr)
+		, right(nullptr)
 	{}
 
 	BinaryNode(T&& x)
-		: mValue(std::move(x))
-		, mLeft(nullptr)
-		, mRight(nullptr)
+		: value(std::move(x))
+		, left(nullptr)
+		, right(nullptr)
 	{}
 	
 	BinaryNode(const BinaryNode& other)
-		: mValue(other.mValue)
-		, mLeft(nullptr)
-		, mRight(nullptr)
+		: value(other.value)
+		, left(nullptr)
+		, right(nullptr)
 	{
-		if (other.mLeft != nullptr) mLeft = new Node(*other.mLeft);
-		if (other.mRight != nullptr) mRight = new Node(*other.mRight);
+		if (other.left != nullptr) left = new Node(*other.left);
+		if (other.right != nullptr) right = new Node(*other.right);
 	}
 
 	BinaryNode(BinaryNode&& other)
-		: mValue(std::move(other.mValue))
-		, mLeft(other.mLeft)
-		, mRight(other.mRight)
+		: value(std::move(other.value))
+		, left(other.left)
+		, right(other.right)
 	{
-		other.mLeft = nullptr;
-		other.mRight = nullptr;
+		other.left = nullptr;
+		other.right = nullptr;
 	}
 
 	~BinaryNode() {
-		delete mLeft;
-		delete mRight;
-	}
-
-	const BinaryNode* left() const {
-		return mLeft;
-	}
-
-	const BinaryNode* right() const {
-		return mRight;
-	}
-
-	const T& value() const {
-		return mValue;
+		delete left;
+		delete right;
 	}
 };
 
@@ -87,10 +75,10 @@ public:
 		while (*node != nullptr) {
 			depth += 1;
 
-			if ((*node)->mValue > x)
-				node = &(*node)->mLeft;
+			if ((*node)->value > x)
+				node = &(*node)->left;
 			else
-				node = &(*node)->mRight;
+				node = &(*node)->right;
 		}
 
 		*node = new Node(std::forward<R>(x));
@@ -98,20 +86,56 @@ public:
 		mDepth = std::max(mDepth, depth + 1);
 	}
 
-	Node* search(T& a) {
-		return nullptr;
-	};
+	Node* search(T& x) {
+		Node *n = mRoot;
+		auto s = std::stack<Node*>();
+		s.push(n);
 
-	Node* searchRecursive(T& a);
+		while(!s.empty()) {
+			while (n) {
+				s.push(n);
+				n = n->left;
+			}
+			
+			if (!n) {
+				n = s.top();
+
+				if (n->value == x)
+					return n;
+				
+				n = n->right;
+				s.pop();
+			}
+		}
+
+		return nullptr;
+	}
+
+	Node* searchRecursive(T& x) {
+		std::function<Node*(Node*)> s;
+		s = [&s, &x](Node* node) {
+			if (!node || node->value == x) return node;
+
+			Node * n;
+
+			n = s(node->left);
+			if (n) return n;
+
+			n = s(node->right);
+			if (n) return n;
+
+			return (Node*) nullptr;
+		};
+
+		return s(mRoot);
+	}
 
 	int size() {
 		return mSize;
+	}
 
-	};
-
-	using __GoToNext = std::function<void(const Node*)>;
-
-	void traverse(std::function<void(const Node*, __GoToNext)> handler) {
+	using __GoToNext = std::function<void(Node*)>;
+	void traverse(std::function<void(Node*, __GoToNext)> handler) {
 		__GoToNext go;
 
 		go = [&handler, &go](auto node) {
@@ -126,48 +150,48 @@ public:
 
 		traverse([&min](auto node, auto go) {
 			min = node;
-			go(node->left());
+			go(node->left);
 		});
 
-		return min->value();
-	};
+		return min->value;
+	}
 
 	const T& maximum() {
 		const Node* max = mRoot;
 
 		traverse([&max](auto node, auto go) {
 			max = node;
-			go(node->right());
+			go(node->right);
 		});
 
-		return max->value();
-	};
+		return max->value;
+	}
 
 	int depth() {
 		return mDepth;
-	};
+	}
 	
 	void inorder() {
 		traverse([](auto node, auto go) {
-			go(node->left());
-			std::cout << node->value() << std::endl;
-			go(node->right());
+			go(node->left);
+			std::cout << node->value << std::endl;
+			go(node->right);
 		});
-	};
+	}
 	
 	void preorder() {
 		traverse([](auto node, auto go) {
-			std::cout << node->value() << std::endl;
-			go(node->left());
-			go(node->right());
+			std::cout << node->value << std::endl;
+			go(node->left);
+			go(node->right);
 		});
-	};
+	}
 	
 	void postorder() {
 		traverse([](auto node, auto go) {
-			go(node->left());
-			go(node->right());
-			std::cout << node->value() << std::endl;
+			go(node->left);
+			go(node->right);
+			std::cout << node->value << std::endl;
 		});
-	};
+	}
 };
