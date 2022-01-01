@@ -27,7 +27,7 @@ private:
 		std::memcpy(data, &k, std::min(sizeof(K), BLOCK_SIZE));
 
 		// TODO: hash data
-		return k % mCapacity();
+		return 0;
 	}
 
 	constexpr size_t mCapacity() const {
@@ -93,7 +93,7 @@ public:
 			if (it->first == k)
 				return it->second;
 		
-		throw std::out_of_range("No entry f0r given key");
+		throw std::out_of_range("No entry for given key");
 	}
 
 	// V& operator[](const K& k);    // Zwraca wartość dla klucza

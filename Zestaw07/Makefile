@@ -17,13 +17,11 @@ HPP			+= Dict.hpp
 
 all: Dict.x
 
-# test: all
-# 	$(Q)./BinaryTree.x < tests/input/100.txt > tests/result/100.txt
-# 	$(Q)./BinaryTree.x < tests/input/10k.txt > tests/result/10k.txt
-# 	$(Q)./BinaryTree.x < tests/input/15a.txt > tests/result/15a.txt
-# 	$(Q)./BinaryTree.x < tests/input/15b.txt > tests/result/15b.txt
-# 	$(Q)diff -rq tests/expected tests/result
-# 	@printf "  TEST\tall tests passed\n"
+test: all
+	$(Q)./Dict.x tests/input/10_arg.txt < tests/input/10_std.txt > tests/result/10.txt
+	$(Q)./Dict.x tests/input/65k_arg.txt < tests/input/65k_std.txt > tests/result/65k.txt
+	$(Q)diff -rq tests/expected tests/result
+	@printf "  TEST\tall tests passed\n"
 
 %.x: %.o
 	@printf "  LD\t$^\n"

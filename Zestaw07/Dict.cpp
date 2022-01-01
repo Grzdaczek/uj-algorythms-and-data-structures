@@ -1,14 +1,20 @@
 #include "Dict.hpp"
 #include <iostream>
 #include <utility>
+#include <fstream>
 
 int main(int argc, char* argv[]) {
-	auto dict = Dictionary<int, int>();
+	auto dict = Dictionary<std::string, std::string>();
 
-	dict.set(0, 42);
-	dict.set(0, 20);
-	dict.set(1024, 11);
+	if (argc < 2)
+		throw std::invalid_argument("File path not provided");
 
-	std::cout << dict.get(0) << std::endl;
-	std::cout << dict.get(1024) << std::endl;
+	auto f = std::ifstream(argv[1]);
+
+	std::string key, value;
+	while (f >> key >> value)
+		dict.set(key, value);
+
+	while (std::cin >> key)
+		std::cout << (dict.has(key) ? dict.get(key) : "-") << std::endl;
 }
