@@ -1,2 +1,14 @@
-*.o
+data
+.DS_Store
+.tmp
+.vscode
+*.sh
+*.set
 *.x
+*.o
+*.d
+*.a
+*.so
+*.swap
+*.tmp
+*.log
