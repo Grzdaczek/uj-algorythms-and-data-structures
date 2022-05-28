@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <stack>
 #include <iostream>
 #include <cassert>
 #include <memory>
@@ -44,6 +45,12 @@ public:
 };
 
 class Graph {
+	class AllVerticesIter;
+	class AllEdgesIter;
+	class EmanEdgesIter;
+	class InciEdgesIter;
+	class DfsVertexIter;
+
 	class AllVerticesIter : public Iterator<Vertex> {
 	private:
 		Graph* m_target;
@@ -95,6 +102,8 @@ class Graph {
 		int m_b;
 
 	public:
+		friend DfsVertexIter;
+
 		EmanEdgesIter(Graph* target, int v) : m_target(target), m_a(v), m_b(0) {
 			if (!m_target->get_edge(m_a, m_b)) next();
 		}
@@ -138,18 +147,39 @@ class Graph {
 		Edge& operator*() { return *m_target->get_edge(m_a, m_b); }
 	};
 
-	class DfsIterator : public Iterator<Vertex> {
+	class DfsVertexIter : public Iterator<Vertex> {
 	private:
 		Graph* m_target;
 		std::vector<bool> m_visited;
-		std::stack<InciEdgesIter> m_stack;
+		std::stack<int> m_stack;
 	public:
-		DfsIterator(Graph* target, Node* start) : m_target(target), m_start(start) {
-			int num = target.vertices_num();
+		DfsVertexIter(Graph* target, int start_vertex) : m_target(target) {
+			m_stack.push(start_vertex);
 
-			for (int i = 0; i < num; ++i) {
-				m_visited.push_back(false)
+			int num = m_target->vertices_num();
+			for (int i = 0; i < num; ++i)
+				m_visited.push_back(false);
+		}
+
+		void next() {
+			if (!m_stack.empty()) {
+				int v = m_stack.top();
+				m_stack.pop();
+				if (!m_visited[v]) {
+					m_visited[v] = true;
+					auto iter = EmanEdgesIter(m_target, v);
+					while (!iter.done()) {
+						if (!m_visited[iter.m_b]) m_stack.push(iter.m_b);
+						iter.next();
+					}
+				}
 			}
+		}
+
+		bool done() { return m_stack.empty(); }
+
+		Vertex& operator*() {
+			return *m_target->get_vertex(m_stack.top());
 		}
 	};
 
@@ -165,7 +195,7 @@ public:
 		: m_directed(directed)
 		, m_edges_num(0)
 		, m_vertices_num(n)
-		, m_edges(std::vector(n, (std::vector<Edge*>(n, nullptr)))) {
+		, m_edges(std::vector<std::vector<Edge*>>(n, (std::vector<Edge*>(n, nullptr)))) {
 		for (int i = 0; i < n; ++i) {
 			m_vertices.push_back(Vertex());
 		}
@@ -190,6 +220,31 @@ public:
 
 	bool is_directed() const {
 		return m_directed;
+	}
+
+	bool is_connected_from(int v) {
+		auto iter = dfs_vertices_iter(v);
+		int j = 0;
+
+		while (!iter->done()) {
+			j += 1;
+			iter->next();
+		}
+
+		return j == m_vertices_num;
+	}
+
+	bool is_connected() {
+		if (m_directed) {
+			for (int i = 0; i < m_vertices_num; ++i) {
+				if (!is_connected_from(i)) return false;
+			}
+
+			return true;
+		}
+		else {
+			return is_connected_from(0);
+		}
 	}
 
 	void new_edge(int v_a, int v_b) {
@@ -243,5 +298,9 @@ public:
 
 	std::unique_ptr<Iterator<Edge>> incident_edges_iter(int v) {
 		return std::make_unique<InciEdgesIter>(InciEdgesIter(this, v));
+	}
+
+	std::unique_ptr<Iterator<Vertex>> dfs_vertices_iter(int v) {
+		return std::make_unique<DfsVertexIter>(DfsVertexIter(this, v));
 	}
 };
